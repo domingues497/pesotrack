@@ -1,10 +1,13 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../pages/add_weight/add_weight_page.dart';
 import '../pages/history/history_page.dart';
 import '../pages/home/home_page.dart';
 import '../pages/imc/imc_page.dart';
 import '../pages/ocr/ocr_page.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_gradients.dart';
+import '../theme/app_spacing.dart';
 import 'routes.dart';
 
 class AppShell extends StatefulWidget {
@@ -19,19 +22,23 @@ class _AppShellState extends State<AppShell> {
 
   static const _titles = <String>['Inicio', 'Registro', 'OCR', 'Historico', 'IMC'];
 
-  final _pages = const [
-    HomePage(),
-    AddWeightPage(),
-    OcrPage(),
-    HistoryPage(),
-    ImcPage(),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final pages = [
+      HomePage(
+        onOpenRegister: () => setState(() => _currentIndex = 1),
+        onOpenOcr: () => setState(() => _currentIndex = 2),
+        onOpenHistory: () => setState(() => _currentIndex = 3),
+      ),
+      const AddWeightPage(),
+      const OcrPage(),
+      const HistoryPage(),
+      const ImcPage(),
+    ];
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(_titles[_currentIndex]),
+        title: _currentIndex == 0 ? const _BrandTitle() : Text(_titles[_currentIndex]),
         actions: [
           IconButton(
             onPressed: () => Navigator.of(context).pushNamed(AppRoutes.profile),
@@ -40,7 +47,7 @@ class _AppShellState extends State<AppShell> {
           ),
         ],
       ),
-      body: SafeArea(child: IndexedStack(index: _currentIndex, children: _pages)),
+      body: SafeArea(child: IndexedStack(index: _currentIndex, children: pages)),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: (index) => setState(() => _currentIndex = index),
@@ -52,6 +59,55 @@ class _AppShellState extends State<AppShell> {
           NavigationDestination(icon: Icon(Icons.monitor_weight_outlined), selectedIcon: Icon(Icons.monitor_weight_rounded), label: 'IMC'),
         ],
       ),
+    );
+  }
+}
+
+class _BrandTitle extends StatelessWidget {
+  const _BrandTitle();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            gradient: AppGradients.accent,
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.accent.withValues(alpha: 0.18),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: const Icon(
+            Icons.show_chart_rounded,
+            color: AppColors.white,
+            size: 20,
+          ),
+        ),
+        const SizedBox(width: AppSpacing.x3),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'PesoTrack',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            Text(
+              'soft wellness edition',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: AppColors.textMuted,
+                  ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
