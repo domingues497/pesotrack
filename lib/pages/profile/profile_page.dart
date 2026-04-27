@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/profile_provider.dart';
@@ -10,7 +10,14 @@ class ProfilePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final profile = ref.watch(profileProvider);
+    final profile = ref.watch(profileProvider).profile;
+    if (profile == null) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Perfil')),
@@ -24,7 +31,9 @@ class ProfilePage extends ConsumerWidget {
                 Text(profile.name, style: Theme.of(context).textTheme.headlineMedium),
                 const SizedBox(height: 8),
                 Text('Altura: ${profile.heightCm.toStringAsFixed(0)} cm'),
+                Text('Peso inicial: ${profile.initialWeight.toStringAsFixed(1)} kg'),
                 Text('Meta: ${profile.goalWeight.toStringAsFixed(1)} kg'),
+                Text('Tipo de meta: ${profile.goalStrategyLabel}'),
                 Text('Idade: ${profile.age} anos'),
               ],
             ),

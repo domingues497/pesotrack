@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/profile_provider.dart';
@@ -11,8 +11,13 @@ class ImcPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final profile = ref.watch(profileProvider);
-    final latest = ref.watch(weightProvider).last;
+    final profile = ref.watch(profileProvider).profile;
+    final entries = ref.watch(weightProvider);
+    if (profile == null || entries.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final latest = entries.last;
     final result = ImcCalculator.calculate(
       weightKg: latest.weight,
       heightCm: profile.heightCm,

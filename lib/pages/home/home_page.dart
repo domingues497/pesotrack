@@ -5,6 +5,7 @@ import '../../models/weight_entry.dart';
 import '../../providers/profile_provider.dart';
 import '../../providers/weight_provider.dart';
 import '../../utils/imc_calculator.dart';
+import '../../widgets/empty_state.dart';
 import '../../widgets/section_header.dart';
 import 'widgets/hero_weight_card.dart';
 import 'widgets/kpi_grid.dart';
@@ -25,8 +26,24 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final profile = ref.watch(profileProvider);
+    final profile = ref.watch(profileProvider).profile;
     final entries = ref.watch(weightProvider);
+    if (profile == null) {
+      return const SizedBox.shrink();
+    }
+
+    if (entries.isEmpty) {
+      return ListView(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        children: const [
+          EmptyState(
+            title: 'Sem registros ainda',
+            message: 'Assim que voce salvar o primeiro peso, o dashboard vai mostrar progresso, grafico e resumo.',
+          ),
+        ],
+      );
+    }
+
     final latest = entries.last;
     final first = entries.first;
     final imc = ImcCalculator.calculate(

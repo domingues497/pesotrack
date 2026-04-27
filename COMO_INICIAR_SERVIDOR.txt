@@ -1,0 +1,62 @@
+PASSO A PASSO PARA INICIAR O PROJETO PESOTRACK
+
+Observacao:
+Este projeto e um app Flutter. Ele nao possui um servidor backend proprio nesta etapa.
+"Iniciar o servidor" aqui significa subir a aplicacao localmente em modo de desenvolvimento.
+
+1. Abrir o terminal na pasta do projeto
+No PowerShell:
+
+cd "d:\trabalhos faculdaded\pesotrack"
+
+2. Confirmar que o Flutter esta instalado
+
+flutter --version
+
+3. Instalar as dependencias do projeto
+
+flutter pub get
+
+4. Verificar dispositivos disponiveis
+
+flutter devices
+
+5. Iniciar a aplicacao em modo debug
+Se houver um celular conectado ou emulador aberto:
+
+flutter run
+
+6. Se quiser rodar no Chrome
+
+flutter run -d chrome
+
+7. Se quiser escolher um dispositivo especifico
+Primeiro veja os dispositivos:
+
+flutter devices
+
+Depois rode usando o id listado:
+
+flutter run -d ID_DO_DISPOSITIVO
+
+8. Para parar a execucao
+No terminal onde o app estiver rodando, pressione:
+
+Ctrl + C
+
+Comandos uteis
+
+Rodar testes:
+flutter test
+
+Analisar o codigo:
+flutter analyze
+
+Gerar APK de release:
+flutter build apk --release
+
+Resumo rapido
+
+cd "d:\trabalhos faculdaded\pesotrack"
+flutter pub get
+flutter run
