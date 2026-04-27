@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>PesoTrack — Estilo C Final</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    :root {
+      --bg:#fff7f4;
+      --surface:#ffffff;
+      --surface-2:#fff0ea;
+      --surface-3:#ffe6dc;
+      --border:rgba(120,53,15,.08);
+      --text:#3b1f1a;
+      --muted:#946f66;
+      --faint:#c59f95;
+      --accent:#e76f51;
+      --accent-2:#f4a261;
+      --accent-deep:#c65a3e;
+      --success:#2a9d8f;
+      --danger:#d1495b;
+      --gold:#e9b949;
+      --shadow-sm:0 8px 24px rgba(120,53,15,.07);
+      --shadow-md:0 18px 42px rgba(120,53,15,.11);
+      --radius-sm:.8rem;
+      --radius-md:1rem;
+      --radius-lg:1.4rem;
+      --radius-xl:1.9rem;
+      --radius-full:999px;
+      --space-1:.25rem; --space-2:.5rem; --space-3:.75rem; --space-4:1rem; --space-5:1.25rem; --space-6:1.5rem; --space-8:2rem;
+      --text-xs:clamp(.75rem,.72rem + .2vw,.85rem);
+      --text-sm:clamp(.88rem,.84rem + .2vw,1rem);
+      --text-base:clamp(1rem,.96rem + .25vw,1.05rem);
+      --text-lg:clamp(1.15rem,1.05rem + .45vw,1.35rem);
+      --text-xl:clamp(1.65rem,1.3rem + 1vw,2.2rem);
+      --safe-bottom:max(env(safe-area-inset-bottom), 12px);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:var(--text-base);min-height:100vh}
+    img,svg,canvas{display:block;max-width:100%}
+    button,input,select,textarea{font:inherit;color:inherit}
+    button{background:none;border:none;cursor:pointer}
+    input,select,textarea{border:none;background:none}
+    :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:10px}
+    .app{max-width:460px;margin:0 auto;min-height:100vh;position:relative}
+    .topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:1rem 1rem .75rem;background:color-mix(in srgb, var(--bg) 88%, transparent);backdrop-filter:blur(16px)}
+    .brand{display:flex;align-items:center;gap:.75rem}
+    .logo{width:40px;height:40px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;box-shadow:var(--shadow-sm)}
+    .brand h1{font-family:'Plus Jakarta Sans',sans-serif;font-size:1rem;font-weight:800;letter-spacing:-.04em}
+    .brand p{font-size:var(--text-xs);color:var(--muted)}
+    .icon-btn{width:42px;height:42px;border-radius:14px;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;box-shadow:var(--shadow-sm)}
+
+    .page{display:none;padding:0 1rem calc(6rem + var(--safe-bottom))}
+    .page.active{display:block;animation:fade .22s ease}
+    @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+    .page-head{margin:.2rem 0 1rem}
+    .page-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:var(--text-xl);font-weight:800;letter-spacing:-.05em}
+    .page-sub{font-size:var(--text-sm);color:var(--muted);margin-top:.25rem}
+
+    .hero{background:linear-gradient(150deg,#fffdfc 0%,#fff0ea 52%,#ffe0d4 100%);border:1px solid var(--border);border-radius:30px;padding:1.2rem;box-shadow:var(--shadow-md);position:relative;overflow:hidden;margin-bottom:1rem}
+    .hero::before{content:'';position:absolute;right:-18px;top:-18px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle, rgba(231,111,81,.18), transparent 68%)}
+    .chip{display:inline-flex;align-items:center;gap:.35rem;background:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.8);padding:.45rem .75rem;border-radius:999px;font-size:11px;font-weight:800;color:var(--accent-deep);backdrop-filter:blur(10px)}
+    .hero-main{margin-top:.8rem;display:flex;justify-content:space-between;gap:1rem;align-items:flex-end}
+    .hero-label{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:800}
+    .hero-weight{font-family:'Plus Jakarta Sans',sans-serif;font-size:3rem;line-height:1;font-weight:800;letter-spacing:-.08em;margin-top:.2rem}
+    .hero-weight span{font-size:1.2rem;color:var(--muted)}
+    .hero-meta{text-align:right;font-size:var(--text-xs);color:var(--muted)}
+    .hero-actions{display:flex;gap:.75rem;margin-top:1rem}
+    .btn{min-height:48px;border-radius:16px;padding:0 1rem;display:inline-flex;align-items:center;justify-content:center;gap:.55rem;font-size:var(--text-sm);font-weight:800}
+    .btn-primary{background:var(--accent);color:#fff;box-shadow:var(--shadow-sm)}
+    .btn-secondary{background:var(--surface);border:1px solid var(--border);color:var(--text)}
+    .btn-soft{background:var(--surface-2);color:var(--accent-deep)}
+    .hero-progress{margin-top:1rem}
+    .hero-progress .labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:.45rem}
+    .track{height:8px;border-radius:999px;background:rgba(231,111,81,.12);overflow:hidden}
+    .fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .7s cubic-bezier(.16,1,.3,1)}
+
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;margin-bottom:1rem}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:1rem;box-shadow:var(--shadow-sm)}
+    .kpi-label{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:800}
+    .kpi-value{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.8rem;line-height:1.05;letter-spacing:-.06em;font-weight:800;margin:.45rem 0 .25rem}
+    .kpi-foot{font-size:var(--text-xs);color:var(--muted)}
+    .up{color:var(--danger)} .down{color:var(--success)}
+    .section-row{display:flex;align-items:center;justify-content:space-between;margin:0 0 .75rem}
+    .section-row h3{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:800}
+    .section-row button{font-size:12px;color:var(--accent-deep);font-weight:800}
+
+    .chart-wrap{height:220px}
+    .hist-list,.stack{display:grid;gap:.75rem}
+    .hist-item{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:.95rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:.75rem;box-shadow:var(--shadow-sm)}
+    .hist-item .w{font-size:1.05rem;font-weight:800;letter-spacing:-.03em}
+    .hist-item .m{font-size:var(--text-xs);color:var(--muted);margin-top:.15rem}
+    .badge{display:inline-flex;align-items:center;padding:.26rem .5rem;border-radius:999px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+    .badge.ocr{background:#fff0ea;color:var(--accent-deep)}
+    .badge.manual{background:#f9f5f3;color:var(--muted)}
+    .delta{font-size:var(--text-sm);font-weight:800}
+
+    .form-card{padding:1rem}
+    .field{display:grid;gap:.45rem;margin-bottom:.9rem}
+    .field label{font-size:var(--text-sm);font-weight:700}
+    .field small{font-size:var(--text-xs);color:var(--muted)}
+    .input{width:100%;min-height:50px;background:var(--surface-2);border:1px solid transparent;border-radius:16px;padding:0 1rem;color:var(--text)}
+    .input:focus{outline:none;border-color:rgba(231,111,81,.35);box-shadow:0 0 0 3px rgba(231,111,81,.12)}
+    .split{display:grid;grid-template-columns:1fr 1fr;gap:.85rem}
+    .textarea{min-height:92px;padding:1rem;resize:vertical}
+
+    .upload{border:2px dashed rgba(231,111,81,.2);background:var(--surface-2);border-radius:24px;min-height:210px;padding:1rem;display:grid;place-items:center;text-align:center;position:relative;overflow:hidden}
+    .upload.drag{border-color:var(--accent)}
+    .upload input{position:absolute;inset:0;opacity:0;cursor:pointer}
+    .upload p{color:var(--muted);font-size:var(--text-sm)}
+    .upload strong{color:var(--accent-deep)}
+    .scan{display:none;position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);animation:scan 1.8s linear infinite}
+    @keyframes scan{from{top:0}to{top:100%}}
+    .ocr-result{display:none;background:#fff4ef;border:1px solid rgba(231,111,81,.18);border-radius:18px;padding:1rem;margin-top:.9rem;align-items:center;gap:.75rem}
+    .ocr-result.show{display:flex}
+
+    .profile-head{display:grid;place-items:center;padding:1rem 0 1.25rem}
+    .avatar{width:74px;height:74px;border-radius:24px;background:linear-gradient(145deg,#fff0ea,#ffe2d5);display:grid;place-items:center;color:var(--accent);box-shadow:var(--shadow-sm);margin-bottom:.75rem}
+    .meta-card{background:linear-gradient(145deg,#fffaf8,#fff1ec);border:1px solid var(--border);border-radius:24px;padding:1rem;box-shadow:var(--shadow-sm)}
+
+    .imc-score{display:grid;place-items:center;text-align:center;padding:1.1rem;border-radius:22px;background:#fff5f1;border:1px solid rgba(231,111,81,.18);margin-bottom:1rem}
+    .imc-score .n{font-family:'Plus Jakarta Sans',sans-serif;font-size:2.1rem;font-weight:800;letter-spacing:-.06em}
+    .imc-bar{height:12px;border-radius:999px;background:linear-gradient(90deg,#60a5fa 0%,#22c55e 26%,#facc15 48%,#fb923c 74%,#ef4444 100%);position:relative;margin:.85rem 0 .5rem}
+    .needle{position:absolute;top:50%;transform:translate(-50%,-50%);width:20px;height:20px;border-radius:50%;border:3px solid var(--accent);background:#fff;box-shadow:var(--shadow-sm);transition:left .7s cubic-bezier(.16,1,.3,1)}
+    .imc-scale{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
+
+    .bottom-nav{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;width:min(430px,calc(100vw - 20px));background:rgba(255,255,255,.82);backdrop-filter:blur(18px);border:1px solid var(--border);border-radius:24px;padding:.45rem;display:grid;grid-template-columns:repeat(5,1fr);gap:.35rem;box-shadow:var(--shadow-md);z-index:25}
+    .tab{min-height:56px;border-radius:18px;display:grid;place-items:center;gap:.24rem;color:var(--muted);font-size:10px;font-weight:800}
+    .tab.active{background:var(--surface-2);color:var(--accent-deep)}
+
+    .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:.8rem 1rem;border-radius:999px;font-size:12px;font-weight:800;box-shadow:var(--shadow-md);opacity:0;pointer-events:none;transition:opacity .2s;z-index:50}
+    .toast.show{opacity:1}
+
+    @media (min-width: 860px){
+      body{padding:1rem}
+      .app{max-width:1200px;border-radius:34px;overflow:hidden;box-shadow:var(--shadow-md);border:1px solid var(--border);background:var(--bg);min-height:calc(100vh - 2rem)}
+      .topbar{padding:1rem 1.25rem}
+      .page{padding:0 1.25rem 1.25rem 6.5rem}
+      .desktop-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:1rem}
+      .bottom-nav{top:50%;bottom:auto;left:16px;transform:translateY(-50%);width:72px;grid-template-columns:1fr;padding:.5rem}
+      .tab{min-height:64px}
+      .wide{grid-column:1 / -1}
+    }
+  </style>
+</head>
+<body>
+  <div class="toast" id="toast"></div>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 16 4-5 4 3 4-5"/></svg>
+        </div>
+        <div>
+          <h1>PesoTrack</h1>
+          <p>soft wellness edition</p>
+        </div>
+      </div>
+      <button class="icon-btn" onclick="goPage('profile')" aria-label="Perfil"><i data-lucide="user-round" width="18" height="18"></i></button>
+    </header>
+
+    <section class="page active" id="page-dashboard">
+      <div class="page-head">
+        <div class="page-title">Seu peso, com calma.</div>
+        <div class="page-sub">Um diário diário mais humano, leve e claro.</div>
+      </div>
+      <div class="desktop-grid">
+        <div>
+          <div class="hero">
+            <div class="chip"><i data-lucide="sparkles" width="12" height="12"></i> foco no progresso real</div>
+            <div class="hero-main">
+              <div>
+                <div class="hero-label">Peso atual</div>
+                <div class="hero-weight"><span id="heroWeightNum">79.5</span> <span>kg</span></div>
+              </div>
+              <div class="hero-meta">
+                <div id="heroDate">último registro</div>
+                <div id="heroGoal">meta 75.0 kg</div>
+              </div>
+            </div>
+            <div class="hero-progress">
+              <div class="labels"><span>início 82.5 kg</span><span>meta 75.0 kg</span></div>
+              <div class="track"><div class="fill" id="heroFill" style="width:40%"></div></div>
+            </div>
+            <div class="hero-actions">
+              <button class="btn btn-primary" onclick="goPage('ocr')"><i data-lucide="camera" width="16" height="16"></i>Escanear</button>
+              <button class="btn btn-secondary" onclick="goPage('register')"><i data-lucide="plus" width="16" height="16"></i>Registrar</button>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <div class="kpi-label">Variação total</div>
+              <div class="kpi-value" id="kpiVariation">-3.0</div>
+              <div class="kpi-foot down" id="kpiVariationText">kg perdidos</div>
+            </div>
+            <div class="card">
+              <div class="kpi-label">IMC atual</div>
+              <div class="kpi-value" id="kpiBmi">25.9</div>
+              <div class="kpi-foot" id="kpiBmiText">Sobrepeso leve</div>
+            </div>
+            <div class="card">
+              <div class="kpi-label">Registros</div>
+              <div class="kpi-value" id="kpiCount">8</div>
+              <div class="kpi-foot">entradas salvas</div>
+            </div>
+            <div class="card">
+              <div class="kpi-label">Faltam</div>
+              <div class="kpi-value" id="kpiMissing">4.5</div>
+              <div class="kpi-foot">kg para sua meta</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="card">
+            <div class="section-row"><h3>Resumo</h3></div>
+            <div class="meta-card">
+              <div style="font-size:12px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.1em;">Tendência</div>
+              <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:-.05em;margin-top:.35rem" id="trendText">queda estável</div>
+              <div style="font-size:var(--text-sm);color:var(--muted);margin-top:.35rem">Seu ritmo recente está consistente e o gráfico mostra uma descida gradual.</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-row"><h3>Últimos registros</h3><button onclick="goPage('history')">ver tudo</button></div>
+            <div class="hist-list" id="recentList"></div>
+          </div>
+        </div>
+
+        <div class="card wide">
+          <div class="section-row"><h3>Evolução do peso</h3><button onclick="goPage('history')">histórico</button></div>
+          <div class="chart-wrap"><canvas id="weightChart"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-register">
+      <div class="page-head">
+        <div class="page-title">Registrar peso</div>
+        <div class="page-sub">Uma entrada rápida para manter o hábito.</div>
+      </div>
+      <div class="card form-card">
+        <div class="field">
+          <label for="regWeight">Peso (kg)</label>
+          <input class="input" id="regWeight" type="number" step="0.1" min="20" max="300" placeholder="79.3" />
+        </div>
+        <div class="split">
+          <div class="field">
+            <label for="regDate">Data</label>
+            <input class="input" id="regDate" type="date" />
+          </div>
+          <div class="field">
+            <label for="regTime">Horário</label>
+            <input class="input" id="regTime" type="time" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="regNote">Como você está hoje?</label>
+          <textarea class="input textarea" id="regNote" placeholder="Ex.: dormi bem, treinei cedo, retenção... "></textarea>
+          <small>Essa nota aparece no histórico.</small>
+        </div>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="saveManual()"><i data-lucide="check" width="16" height="16"></i>Salvar</button>
+          <button class="btn btn-secondary" onclick="goPage('dashboard')">Cancelar</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-ocr">
+      <div class="page-head">
+        <div class="page-title">OCR simulado</div>
+        <div class="page-sub">Envie uma foto da balança e confirme o peso detectado.</div>
+      </div>
+      <div class="card">
+        <div class="upload" id="uploadZone">
+          <input type="file" id="ocrFile" accept="image/*" />
+          <div class="scan" id="scanLine"></div>
+          <div id="uploadContent">
+            <i data-lucide="image-plus" width="42" height="42" style="margin:0 auto .7rem;color:var(--accent);"></i>
+            <p><strong>Toque para enviar</strong> ou arraste uma imagem da balança.</p>
+          </div>
+          <img id="ocrPreview" style="display:none;max-height:160px;border-radius:16px;margin:0 auto;" alt="preview da balança" />
+        </div>
+        <div class="ocr-result" id="ocrResult">
+          <i data-lucide="scan-search" width="24" height="24" style="color:var(--accent);flex-shrink:0"></i>
+          <div>
+            <div style="font-size:var(--text-sm);font-weight:800">Peso detectado: <span id="ocrDetected">79.4</span> kg</div>
+            <div style="font-size:var(--text-xs);color:var(--muted)">confiança simulada 97%</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" id="ocrConfirm" style="display:none;">
+        <div class="field">
+          <label for="ocrWeight">Peso confirmado</label>
+          <input class="input" id="ocrWeight" type="number" step="0.1" />
+        </div>
+        <div class="field">
+          <label for="ocrDate">Data</label>
+          <input class="input" id="ocrDate" type="date" />
+        </div>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="saveOCR()"><i data-lucide="save" width="16" height="16"></i>Salvar OCR</button>
+          <button class="btn btn-secondary" onclick="resetOCR()">Cancelar</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-history">
+      <div class="page-head">
+        <div class="page-title">Histórico</div>
+        <div class="page-sub">Seus registros aparecem em cartões fáceis de ler no celular.</div>
+      </div>
+      <div class="section-row"><h3>Registros salvos</h3><button onclick="exportCSV()">exportar CSV</button></div>
+      <div class="hist-list" id="historyList"></div>
+    </section>
+
+    <section class="page" id="page-imc">
+      <div class="page-head">
+        <div class="page-title">Calculadora de IMC</div>
+        <div class="page-sub">Use peso, altura, idade e sexo para uma leitura rápida.</div>
+      </div>
+      <div class="card form-card">
+        <div class="split">
+          <div class="field">
+            <label for="bmiWeight">Peso (kg)</label>
+            <input class="input" id="bmiWeight" type="number" step="0.1" oninput="calcBMI()" />
+          </div>
+          <div class="field">
+            <label for="bmiHeight">Altura (cm)</label>
+            <input class="input" id="bmiHeight" type="number" oninput="calcBMI()" />
+          </div>
+        </div>
+        <div class="split">
+          <div class="field">
+            <label for="bmiAge">Idade</label>
+            <input class="input" id="bmiAge" type="number" oninput="calcBMI()" placeholder="30" />
+          </div>
+          <div class="field">
+            <label for="bmiSex">Sexo biológico</label>
+            <select class="input" id="bmiSex" onchange="calcBMI()">
+              <option value="">Selecionar</option>
+              <option value="M">Masculino</option>
+              <option value="F">Feminino</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div id="bmiResult"></div>
+    </section>
+
+    <section class="page" id="page-profile">
+      <div class="page-head">
+        <div class="page-title">Perfil</div>
+        <div class="page-sub">Seus dados deixam o app mais útil e mais pessoal.</div>
+      </div>
+      <div class="card form-card">
+        <div class="profile-head">
+          <div class="avatar"><i data-lucide="heart" width="28" height="28"></i></div>
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.2rem;font-weight:800;letter-spacing:-.04em">Seu cuidado diário</div>
+          <div style="font-size:var(--text-sm);color:var(--muted);margin-top:.25rem">Altura, sexo e meta ajudam nos cálculos.</div>
+        </div>
+        <div class="field">
+          <label for="profileName">Nome</label>
+          <input class="input" id="profileName" type="text" placeholder="Seu nome" />
+        </div>
+        <div class="split">
+          <div class="field">
+            <label for="profileHeight">Altura (cm)</label>
+            <input class="input" id="profileHeight" type="number" />
+          </div>
+          <div class="field">
+            <label for="profileSex">Sexo</label>
+            <select class="input" id="profileSex">
+              <option value="">Selecionar</option>
+              <option value="M">Masculino</option>
+              <option value="F">Feminino</option>
+            </select>
+          </div>
+        </div>
+        <div class="split">
+          <div class="field">
+            <label for="profileAge">Idade</label>
+            <input class="input" id="profileAge" type="number" />
+          </div>
+          <div class="field">
+            <label for="profileGoal">Meta (kg)</label>
+            <input class="input" id="profileGoal" type="number" step="0.1" />
+          </div>
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="saveProfile()"><i data-lucide="save" width="16" height="16"></i>Salvar perfil</button>
+      </div>
+    </section>
+
+    <nav class="bottom-nav">
+      <button class="tab active" id="tab-dashboard" onclick="goPage('dashboard')"><i data-lucide="house" width="18" height="18"></i><span>Início</span></button>
+      <button class="tab" id="tab-register" onclick="goPage('register')"><i data-lucide="plus-circle" width="18" height="18"></i><span>Registro</span></button>
+      <button class="tab" id="tab-ocr" onclick="goPage('ocr')"><i data-lucide="scan-search" width="18" height="18"></i><span>OCR</span></button>
+      <button class="tab" id="tab-history" onclick="goPage('history')"><i data-lucide="list" width="18" height="18"></i><span>Histórico</span></button>
+      <button class="tab" id="tab-imc" onclick="goPage('imc')"><i data-lucide="activity" width="18" height="18"></i><span>IMC</span></button>
+    </nav>
+  </div>
+
+  <script>
+    const state = {
+      records: [
+        { id:1, date:'2024-01-05', time:'07:00', weight:82.5, note:'Início do diário', type:'manual' },
+        { id:2, date:'2024-01-08', time:'07:12', weight:82.1, note:'', type:'manual' },
+        { id:3, date:'2024-01-12', time:'07:08', weight:81.6, note:'Após corrida', type:'manual' },
+        { id:4, date:'2024-01-15', time:'07:09', weight:81.0, note:'Via foto', type:'ocr' },
+        { id:5, date:'2024-01-19', time:'07:10', weight:80.8, note:'Dieta ok', type:'manual' },
+        { id:6, date:'2024-01-23', time:'07:03', weight:80.3, note:'', type:'ocr' },
+        { id:7, date:'2024-01-26', time:'07:11', weight:79.9, note:'Semana boa', type:'manual' },
+        { id:8, date:'2024-01-30', time:'07:12', weight:79.5, note:'', type:'manual' },
+      ],
+      profile: { name:'Rafael', height:175, sex:'M', age:30, goal:75.0 },
+      nextId: 9,
+      detectedWeight: null,
+      chart: null,
+    };
+
+    function $(id){ return document.getElementById(id); }
+    function showToast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800); }
+    function sortedRecords(){ return [...state.records].sort((a,b)=> new Date(a.date)-new Date(b.date)); }
+    function latest(){ const s=sortedRecords(); return s[s.length-1]; }
+    function first(){ const s=sortedRecords(); return s[0]; }
+    function formatDate(date){ return new Date(date+'T00:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}); }
+    function badge(type){ return `<span class="badge ${type}">${type==='ocr'?'OCR':'manual'}</span>`; }
+
+    function goPage(name){
+      document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      $('page-'+name).classList.add('active');
+      const tab=$('tab-'+name);
+      if(tab) tab.classList.add('active');
+      if(name==='dashboard') renderDashboard();
+      if(name==='history') renderHistory();
+      if(name==='imc') prefillBMI();
+      lucide.createIcons();
+    }
+
+    function bmiCategory(v){
+      if(v<18.5) return {label:'Abaixo do peso', color:'#60a5fa', pos:10};
+      if(v<25) return {label:'Peso normal', color:'#22c55e', pos:34};
+      if(v<30) return {label:'Sobrepeso', color:'#facc15', pos:56};
+      if(v<35) return {label:'Obesidade grau I', color:'#fb923c', pos:76};
+      if(v<40) return {label:'Obesidade grau II', color:'#ef4444', pos:90};
+      return {label:'Obesidade grau III', color:'#7f1d1d', pos:97};
+    }
+
+    function renderDashboard(){
+      const s=sortedRecords(); if(!s.length) return;
+      const l=s[s.length-1], f=s[0];
+      const total=(l.weight-f.weight).toFixed(1);
+      const bmi=(l.weight/((state.profile.height/100)**2));
+      const missing=Math.max(0,(l.weight-state.profile.goal)).toFixed(1);
+      $('heroWeightNum').textContent=l.weight.toFixed(1);
+      $('heroDate').textContent=`${formatDate(l.date)} · ${l.time}`;
+      $('heroGoal').textContent=`meta ${state.profile.goal.toFixed(1)} kg`;
+      const progress=((f.weight-l.weight)/(f.weight-state.profile.goal))*100;
+      $('heroFill').style.width=Math.max(5,Math.min(100,progress||0))+'%';
+      $('kpiVariation').textContent=(total>0?'+':'')+total;
+      $('kpiVariationText').textContent=parseFloat(total)<=0?`${Math.abs(total)} kg perdidos`:`${total} kg acima`;
+      $('kpiVariationText').className='kpi-foot '+(parseFloat(total)<=0?'down':'up');
+      $('kpiBmi').textContent=bmi.toFixed(1);
+      $('kpiBmiText').textContent=bmiCategory(bmi).label;
+      $('kpiCount').textContent=s.length;
+      $('kpiMissing').textContent=missing;
+      $('trendText').textContent=parseFloat(total)<0?'queda estável':'atenção ao ritmo';
+      const recent=[...s].reverse().slice(0,3);
+      $('recentList').innerHTML=recent.map((r,idx)=>{
+        const prev=s[s.length-2-idx];
+        const delta=prev? +(r.weight-prev.weight).toFixed(1) : null;
+        return `<div class="hist-item"><div><div class="w">${r.weight.toFixed(1)} kg</div><div class="m">${formatDate(r.date)} · ${r.note || 'sem nota'} · ${badge(r.type)}</div></div><div class="delta ${delta===null?'':delta<=0?'down':'up'}">${delta===null?'—':(delta>0?'+':'')+delta+' kg'}</div></div>`;
+      }).join('');
+      renderChart();
+      lucide.createIcons();
+    }
+
+    function renderChart(){
+      const s=sortedRecords();
+      const ctx=$('weightChart').getContext('2d');
+      const g=ctx.createLinearGradient(0,0,0,220); g.addColorStop(0,'rgba(231,111,81,.25)'); g.addColorStop(1,'rgba(231,111,81,0)');
+      if(state.chart) state.chart.destroy();
+      state.chart=new Chart(ctx,{type:'line',data:{labels:s.map(r=>formatDate(r.date)),datasets:[{data:s.map(r=>r.weight),borderColor:'#e76f51',backgroundColor:g,fill:true,borderWidth:2.6,tension:.36,pointRadius:4,pointHoverRadius:6,pointBackgroundColor:'#e76f51',pointBorderColor:'#fff',pointBorderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#3b1f1a',padding:10,callbacks:{label:(c)=>` ${c.parsed.y.toFixed(1)} kg`}}},scales:{x:{grid:{color:'rgba(120,53,15,.06)'},ticks:{color:'#946f66',font:{size:11,family:'Inter'}}},y:{grid:{color:'rgba(120,53,15,.06)'},ticks:{color:'#946f66',font:{size:11,family:'Inter'},callback:(v)=>v+' kg'},suggestedMin:Math.min(...s.map(r=>r.weight))-1,suggestedMax:Math.max(...s.map(r=>r.weight))+1}}}});
+    }
+
+    function renderHistory(){
+      const s=[...sortedRecords()].reverse();
+      $('historyList').innerHTML=s.map((r,i)=>{
+        const prev=s[i+1];
+        const delta=prev? +(r.weight-prev.weight).toFixed(1) : null;
+        return `<div class="hist-item"><div><div class="w">${r.weight.toFixed(1)} kg</div><div class="m">${formatDate(r.date)} · ${r.time} · ${r.note||'sem nota'} · ${badge(r.type)}</div></div><div style="display:flex;align-items:center;gap:.65rem"><div class="delta ${delta===null?'':delta<=0?'down':'up'}">${delta===null?'—':(delta>0?'+':'')+delta+' kg'}</div><button class="icon-btn" style="width:36px;height:36px" onclick="removeRecord(${r.id})"><i data-lucide="trash-2" width="16" height="16"></i></button></div></div>`;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function saveManual(){
+      const weight=parseFloat($('regWeight').value), date=$('regDate').value, time=$('regTime').value || '07:00', note=$('regNote').value.trim();
+      if(!date){ showToast('Selecione uma data'); return; }
+      if(isNaN(weight)||weight<20||weight>300){ showToast('Peso inválido'); return; }
+      state.records.push({id:state.nextId++, date, time, weight, note, type:'manual'});
+      $('regWeight').value=''; $('regNote').value='';
+      showToast('Registro salvo');
+      goPage('dashboard');
+    }
+
+    function resetOCR(){
+      $('ocrPreview').style.display='none'; $('ocrPreview').src=''; $('uploadContent').style.display='block'; $('ocrResult').classList.remove('show'); $('ocrConfirm').style.display='none'; $('scanLine').style.display='none'; $('ocrFile').value=''; state.detectedWeight=null;
+    }
+
+    function saveOCR(){
+      const weight=parseFloat($('ocrWeight').value), date=$('ocrDate').value;
+      if(isNaN(weight)||!date){ showToast('Confirme peso e data'); return; }
+      state.records.push({id:state.nextId++, date, time:'07:00', weight, note:'Via OCR', type:'ocr'});
+      resetOCR(); showToast('OCR salvo'); goPage('dashboard');
+    }
+
+    function bindOCR(){
+      const zone=$('uploadZone'), input=$('ocrFile');
+      zone.addEventListener('dragover',e=>{e.preventDefault(); zone.classList.add('drag');});
+      zone.addEventListener('dragleave',()=>zone.classList.remove('drag'));
+      zone.addEventListener('drop',e=>{e.preventDefault(); zone.classList.remove('drag'); if(e.dataTransfer.files[0]){ input.files=e.dataTransfer.files; handleOCRFile(e.dataTransfer.files[0]); }});
+      input.addEventListener('change',()=>{ if(input.files[0]) handleOCRFile(input.files[0]); });
+    }
+
+    function handleOCRFile(file){
+      const reader=new FileReader();
+      reader.onload=(e)=>{
+        $('ocrPreview').src=e.target.result; $('ocrPreview').style.display='block'; $('uploadContent').style.display='none'; $('scanLine').style.display='block'; $('ocrResult').classList.remove('show'); $('ocrConfirm').style.display='none';
+        setTimeout(()=>{
+          $('scanLine').style.display='none';
+          const base=latest()? latest().weight : 75;
+          const detected=(base + (Math.random()*0.5 - 0.25)).toFixed(1);
+          state.detectedWeight=parseFloat(detected);
+          $('ocrDetected').textContent=detected;
+          $('ocrWeight').value=detected;
+          $('ocrDate').value=new Date().toISOString().split('T')[0];
+          $('ocrResult').classList.add('show');
+          $('ocrConfirm').style.display='block';
+          lucide.createIcons();
+        },1800);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function calcBMI(){
+      const w=parseFloat($('bmiWeight').value), h=parseFloat($('bmiHeight').value), age=parseFloat($('bmiAge').value), sex=$('bmiSex').value;
+      if(!w||!h||h<100){ $('bmiResult').innerHTML=''; return; }
+      const bmi=w/((h/100)**2), cat=bmiCategory(bmi);
+      const ideal = sex==='F' ? [(h-100)*0.85, (h-100)*1.0] : [(h-100)*0.9, (h-100)*1.05];
+      $('bmiResult').innerHTML=`
+        <div class="imc-score">
+          <div style="font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:800">Seu resultado</div>
+          <div class="n" style="color:${cat.color}">${bmi.toFixed(1)}</div>
+          <div style="font-weight:800;margin-top:.25rem">${cat.label}</div>
+        </div>
+        <div class="card">
+          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:800">Escala visual</div>
+          <div class="imc-bar"><div class="needle" style="left:${cat.pos}%"></div></div>
+          <div class="imc-scale"><span>baixo</span><span>normal</span><span>sobre</span><span>obeso</span></div>
+        </div>
+        ${sex ? `<div class="card" style="background:#f6fffc;border-color:rgba(42,157,143,.15)"><div style="font-size:12px;color:var(--success);text-transform:uppercase;letter-spacing:.1em;font-weight:800">Faixa estimada de peso</div><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.5rem;font-weight:800;letter-spacing:-.05em;margin-top:.35rem">${ideal[0].toFixed(1)} – ${ideal[1].toFixed(1)} kg</div><div style="font-size:var(--text-xs);color:var(--muted);margin-top:.35rem">Estimativa baseada em ${h} cm e sexo ${sex==='M'?'masculino':'feminino'}.</div></div>` : ''}
+        ${age>=65 ? `<div class="card" style="background:#fff8ef"><div style="font-size:var(--text-xs);color:var(--muted)">⚠️ Em pessoas acima de 65 anos, o IMC deve ser interpretado com contexto clínico.</div></div>` : ''}
+      `;
+    }
+
+    function prefillBMI(){
+      const l=latest();
+      if(l) $('bmiWeight').value=l.weight;
+      $('bmiHeight').value=state.profile.height || '';
+      $('bmiAge').value=state.profile.age || '';
+      $('bmiSex').value=state.profile.sex || '';
+      calcBMI();
+    }
+
+    function saveProfile(){
+      state.profile.name=$('profileName').value.trim();
+      state.profile.height=parseFloat($('profileHeight').value) || 175;
+      state.profile.sex=$('profileSex').value;
+      state.profile.age=parseFloat($('profileAge').value) || 30;
+      state.profile.goal=parseFloat($('profileGoal').value) || 75;
+      showToast('Perfil salvo');
+      renderDashboard();
+    }
+
+    function exportCSV(){
+      const rows=['date,time,weight,note,type', ...sortedRecords().map(r => `${r.date},${r.time},${r.weight},"${(r.note||'').replace(/"/g,'""')}",${r.type}`)];
+      const blob=new Blob([rows.join('\n')], {type:'text/csv'});
+      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pesotrack-estilo-c.csv'; a.click();
+      showToast('CSV exportado');
+    }
+
+    function removeRecord(id){ state.records=state.records.filter(r=>r.id!==id); renderHistory(); renderDashboard(); showToast('Registro excluído'); }
+
+    function seedProfile(){
+      $('profileName').value=state.profile.name;
+      $('profileHeight').value=state.profile.height;
+      $('profileSex').value=state.profile.sex;
+      $('profileAge').value=state.profile.age;
+      $('profileGoal').value=state.profile.goal;
+      $('regDate').value=new Date().toISOString().split('T')[0];
+      const n=new Date(); $('regTime').value=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+    }
+
+    document.addEventListener('DOMContentLoaded',()=>{
+      seedProfile();
+      bindOCR();
+      renderDashboard();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
