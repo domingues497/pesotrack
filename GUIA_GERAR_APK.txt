@@ -1,0 +1,88 @@
+GUIA PARA GERAR APK DO PESOTRACK
+
+1. Abrir o terminal na pasta do projeto
+
+cd "d:\trabalhos faculdaded\pesotrack"
+
+2. Baixar ou atualizar as dependencias
+
+flutter pub get
+
+3. Verificar se o projeto esta sem erros
+
+flutter analyze
+flutter test
+
+4. Gerar APK de release
+
+flutter build apk --release
+
+5. Local do arquivo gerado
+
+build\app\outputs\flutter-apk\app-release.apk
+
+6. Instalar manualmente no celular
+- Copie o arquivo APK para o celular
+- Abra o arquivo no aparelho
+- Permita instalar apps de fonte desconhecida, se o Android pedir
+- Conclua a instalacao
+
+7. Gerar APK para arquitetura especifica
+Se quiser um APK menor para uma arquitetura especifica:
+
+flutter build apk --release --target-platform android-arm64
+
+8. Gerar APK dividido por arquitetura
+Se quiser APKs separados:
+
+flutter build apk --split-per-abi
+
+Arquivos gerados normalmente:
+- app-armeabi-v7a-release.apk
+- app-arm64-v8a-release.apk
+- app-x86_64-release.apk
+
+9. Gerar App Bundle para Play Store
+Para publicacao na Google Play, o mais recomendado e:
+
+flutter build appbundle --release
+
+Arquivo gerado:
+
+build\app\outputs\bundle\release\app-release.aab
+
+10. Ajustes importantes antes de publicar
+- Trocar o applicationId do app
+- Configurar assinatura de release
+- Revisar nome, icone e versao do aplicativo
+
+Arquivo onde fica o applicationId:
+
+android\app\build.gradle.kts
+
+Hoje o projeto usa:
+
+applicationId = "com.example.pesotrack"
+
+Exemplo de id real:
+
+applicationId = "br.com.seunome.pesotrack"
+
+11. Comando rapido
+
+cd "d:\trabalhos faculdaded\pesotrack"
+flutter pub get
+flutter analyze
+flutter test
+flutter build apk --release
+
+12. Se der erro no build
+- Rode flutter clean
+- Rode flutter pub get novamente
+- Tente gerar de novo
+
+Comandos:
+
+flutter clean
+flutter pub get
+flutter build apk --release
