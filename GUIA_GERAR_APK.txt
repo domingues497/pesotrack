@@ -55,20 +55,35 @@ build\app\outputs\bundle\release\app-release.aab
 - Trocar o applicationId do app
 - Configurar assinatura de release
 - Revisar nome, icone e versao do aplicativo
+- Manter a correcao do R8 para o ML Kit no release
 
 Arquivo onde fica o applicationId:
 
 android\app\build.gradle.kts
 
-Hoje o projeto usa:
+Agora o projeto usa:
 
-applicationId = "com.example.pesotrack"
+applicationId = "br.com.domingues.pesotrak"
 
-Exemplo de id real:
+Namespace configurado:
 
-applicationId = "br.com.seunome.pesotrack"
+namespace = "br.com.domingues.pesotrak"
 
-11. Comando rapido
+11. Correcao aplicada para erro do R8
+Se aparecer erro parecido com:
+
+Execution failed for task ':app:minifyReleaseWithR8'
+
+No PesoTrack a correcao foi:
+- adicionar o arquivo android\app\proguard-rules.pro
+- referenciar esse arquivo no bloco release do android\app\build.gradle.kts
+- incluir regras -dontwarn para classes opcionais do Google ML Kit Text Recognition
+
+Arquivo criado:
+
+android\app\proguard-rules.pro
+
+12. Comando rapido
 
 cd "d:\trabalhos faculdaded\pesotrack"
 flutter pub get
@@ -76,7 +91,7 @@ flutter analyze
 flutter test
 flutter build apk --release
 
-12. Se der erro no build
+13. Se der erro no build
 - Rode flutter clean
 - Rode flutter pub get novamente
 - Tente gerar de novo
@@ -86,3 +101,14 @@ Comandos:
 flutter clean
 flutter pub get
 flutter build apk --release
+
+14. Arquivo .bat para automatizar
+Foi criado um arquivo na raiz do projeto:
+
+GERAR_APK.bat
+
+Para usar:
+- Clique duas vezes no arquivo, ou
+- Rode no terminal:
+
+.\GERAR_APK.bat
