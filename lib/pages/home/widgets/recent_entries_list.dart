@@ -15,13 +15,15 @@ class RecentEntriesList extends StatelessWidget {
     super.key,
     required this.entries,
     required this.previousEntries,
-    required this.trendText,
+    required this.trendTitle,
+    required this.trendDescription,
     this.onOpenHistory,
   });
 
   final List<WeightEntry> entries;
   final List<WeightEntry> previousEntries;
-  final String trendText;
+  final String trendTitle;
+  final String trendDescription;
   final VoidCallback? onOpenHistory;
 
   @override
@@ -37,19 +39,19 @@ class RecentEntriesList extends StatelessWidget {
               const SectionHeader(title: 'Resumo'),
               const SizedBox(height: AppSpacing.x3),
               Text(
-                'Tendencia',
+                'Tendência',
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       color: AppColors.textMuted,
                     ),
               ),
               const SizedBox(height: AppSpacing.x2),
               Text(
-                trendText,
+                trendTitle,
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
               const SizedBox(height: AppSpacing.x2),
               Text(
-                'Seu ritmo recente esta consistente e o historico mostra a direcao mais importante do momento.',
+                trendDescription,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.textMuted,
                     ),
@@ -59,8 +61,8 @@ class RecentEntriesList extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.x4),
         SectionHeader(
-          title: 'Ultimos registros',
-          actionLabel: 'ver tudo',
+          title: 'Últimos registros',
+          actionLabel: 'Ver tudo',
           onAction: onOpenHistory,
         ),
         const SizedBox(height: AppSpacing.x3),
@@ -86,7 +88,7 @@ class RecentEntriesList extends StatelessWidget {
                         ),
                         const SizedBox(height: AppSpacing.x1),
                         Text(
-                          '${entry.recordedAt.asShortDateTime}  .  ${entry.typeLabel}',
+                          '${entry.recordedAt.asShortDateTime} · ${entry.typeLabel}',
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 color: AppColors.textMuted,
                               ),

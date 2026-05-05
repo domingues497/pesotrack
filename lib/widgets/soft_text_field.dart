@@ -13,6 +13,8 @@ class SoftTextField extends StatelessWidget {
     this.helperText,
     this.controller,
     this.suffixIcon,
+    this.readOnly = false,
+    this.onTap,
   });
 
   final String label;
@@ -22,6 +24,8 @@ class SoftTextField extends StatelessWidget {
   final String? helperText;
   final TextEditingController? controller;
   final Widget? suffixIcon;
+  final bool readOnly;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +38,8 @@ class SoftTextField extends StatelessWidget {
           controller: controller,
           keyboardType: keyboardType,
           maxLines: maxLines,
+          readOnly: readOnly,
+          onTap: onTap,
           style: Theme.of(context).textTheme.bodyLarge,
           decoration: InputDecoration(
             hintText: hintText,

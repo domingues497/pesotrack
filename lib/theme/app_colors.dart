@@ -8,7 +8,7 @@ abstract final class AppColors {
   static const surfaceWarm = Color(0xFFFFF4EF);
   static const border = Color(0x14AA6A56);
   static const textPrimary = Color(0xFF3B1F1A);
-  static const textMuted = Color(0xFF946F66);
+  static const textMuted = Color.fromARGB(255, 207, 166, 155);
   static const textFaint = Color(0xFFC59F95);
   static const accent = Color(0xFFE76F51);
   static const accentSoft = Color(0xFFF4A261);

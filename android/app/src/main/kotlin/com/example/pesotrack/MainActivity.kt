@@ -1,4 +1,4 @@
-package com.example.pesotrack
+package br.com.domingues.pesotrak
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -49,6 +49,47 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
     await _profileService.saveProfile(profile);
   }
 
+  Future<void> startNewGoal({
+    required double startWeight,
+    required double targetWeight,
+    required DateTime startDate,
+    required DateTime targetDate,
+    required GoalStrategy strategy,
+  }) async {
+    final profile = state.profile;
+    if (profile == null) {
+      return;
+    }
+
+    final updatedProfile = profile.startNewGoal(
+      startWeight: startWeight,
+      targetWeight: targetWeight,
+      startDate: startDate,
+      targetDate: targetDate,
+      strategy: strategy,
+    );
+
+    state = ProfileState(
+      isLoading: false,
+      profile: updatedProfile,
+    );
+    await _profileService.saveProfile(updatedProfile);
+  }
+
+  Future<void> endActiveGoal(GoalStatus status) async {
+    final profile = state.profile;
+    if (profile == null) {
+      return;
+    }
+
+    final updatedProfile = profile.endActiveGoal(status);
+    state = ProfileState(
+      isLoading: false,
+      profile: updatedProfile,
+    );
+    await _profileService.saveProfile(updatedProfile);
+  }
+
   Future<void> clearProfile() async {
     state = const ProfileState(isLoading: false);
     await _profileService.clearProfile();

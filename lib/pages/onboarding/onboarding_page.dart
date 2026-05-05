@@ -28,7 +28,7 @@ class OnboardingPage extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSpacing.x3),
                   Text(
-                    'Vamos configurar seu acompanhamento para calcular uma meta inteligente e registrar seu peso com a camera da balanca.',
+                    'Vamos configurar seu acompanhamento para calcular uma meta inteligente e registrar seu peso de forma simples e consistente.',
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 ],
@@ -41,27 +41,27 @@ class OnboardingPage extends StatelessWidget {
                 children: [
                   _OnboardingBullet(
                     icon: Icons.person_rounded,
-                    title: 'Seu perfil basico',
+                    title: 'Seu perfil básico',
                     description: 'Nome, altura, sexo e data de nascimento para calcular IMC e contexto.',
                   ),
                   SizedBox(height: AppSpacing.x4),
                   _OnboardingBullet(
                     icon: Icons.monitor_weight_rounded,
                     title: 'Seu peso atual',
-                    description: 'Use o peso atual para sugerir uma meta coerente com a sua situacao de hoje.',
+                    description: 'Use o peso atual para sugerir uma meta coerente com a sua situação de hoje.',
                   ),
                   SizedBox(height: AppSpacing.x4),
                   _OnboardingBullet(
                     icon: Icons.flag_rounded,
                     title: 'Sua escolha de meta',
-                    description: 'Voce decide entre usar a meta sugerida pelo IMC ou informar uma meta propria.',
+                    description: 'Você decide entre usar a meta sugerida pelo IMC ou informar uma meta própria.',
                   ),
                 ],
               ),
             ),
             const SizedBox(height: AppSpacing.x5),
             SoftButton.primary(
-              label: 'Comecar cadastro',
+              label: 'Começar cadastro',
               icon: Icons.arrow_forward_rounded,
               expand: true,
               onPressed: () => Navigator.of(context).pushNamed(AppRoutes.profileSetup),

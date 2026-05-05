@@ -29,6 +29,7 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
   BiologicalSex _sex = BiologicalSex.male;
   GoalStrategy _goalStrategy = GoalStrategy.suggestedByImc;
   DateTime? _birthDate;
+  DateTime? _targetDate;
   bool _isSaving = false;
 
   @override
@@ -94,6 +95,7 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
     final now = DateTime.now();
     final selected = await showDatePicker(
       context: context,
+      locale: const Locale('pt', 'BR'),
       initialDate: DateTime(now.year - 30, now.month, now.day),
       firstDate: DateTime(1920),
       lastDate: DateTime(now.year - 10, now.month, now.day),
@@ -113,6 +115,7 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
     final height = _heightCm;
     final initialWeight = _initialWeight;
     final birthDate = _birthDate;
+    final targetDate = _targetDate;
     final suggestedGoal = _suggestedGoal;
     final customGoal = _parseDouble(_goalController.text);
 
@@ -121,15 +124,19 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
       return;
     }
     if (height == null || height < 100 || height > 250) {
-      AppToast.show(context, 'Informe uma altura valida em centimetros.');
+      AppToast.show(context, 'Informe uma altura válida em centímetros.');
       return;
     }
     if (initialWeight == null || initialWeight < 20 || initialWeight > 300) {
-      AppToast.show(context, 'Informe um peso atual valido em kg.');
+      AppToast.show(context, 'Informe um peso atual válido em kg.');
       return;
     }
     if (birthDate == null) {
       AppToast.show(context, 'Escolha sua data de nascimento.');
+      return;
+    }
+    if (targetDate == null) {
+      AppToast.show(context, 'Escolha a data-alvo da sua meta.');
       return;
     }
     if (_goalStrategy == GoalStrategy.suggestedByImc && suggestedGoal == null) {
@@ -137,7 +144,7 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
       return;
     }
     if (_goalStrategy == GoalStrategy.custom && (customGoal == null || customGoal < 20 || customGoal > 300)) {
-      AppToast.show(context, 'Informe uma meta personalizada valida.');
+      AppToast.show(context, 'Informe uma meta personalizada válida.');
       return;
     }
 
@@ -153,8 +160,17 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
       heightCm: height,
       sex: _sex,
       birthDate: birthDate,
-      goalWeight: goalWeight,
-      goalStrategy: _goalStrategy,
+      goals: [
+        GoalPlan(
+          id: 'initial-goal',
+          startWeight: initialWeight,
+          targetWeight: goalWeight,
+          startDate: DateTime.now(),
+          targetDate: targetDate,
+          strategy: _goalStrategy,
+          status: GoalStatus.active,
+        ),
+      ],
     );
 
     await ref.read(profileProvider.notifier).saveProfile(profile);
@@ -182,6 +198,33 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
     return '${birthDate.day.toString().padLeft(2, '0')}/${birthDate.month.toString().padLeft(2, '0')}/${birthDate.year}';
   }
 
+  Future<void> _selectTargetDate() async {
+    final now = DateTime.now();
+    final selected = await showDatePicker(
+      context: context,
+      locale: const Locale('pt', 'BR'),
+      initialDate: _targetDate ?? now.add(const Duration(days: 90)),
+      firstDate: now,
+      lastDate: now.add(const Duration(days: 730)),
+    );
+
+    if (selected == null) {
+      return;
+    }
+
+    setState(() {
+      _targetDate = selected;
+    });
+  }
+
+  String _targetDateLabel() {
+    final targetDate = _targetDate;
+    if (targetDate == null) {
+      return 'Selecionar data-alvo';
+    }
+    return '${targetDate.day.toString().padLeft(2, '0')}/${targetDate.month.toString().padLeft(2, '0')}/${targetDate.year}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final imcResult = _imcResult;
@@ -201,7 +244,7 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
                 SoftTextField(
                   controller: _nameController,
                   label: 'Nome',
-                  hintText: 'Como voce quer ser chamado',
+                  hintText: 'Como você quer ser chamado',
                 ),
                 const SizedBox(height: AppSpacing.x4),
                 SoftTextField(
@@ -218,7 +261,7 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 ),
                 const SizedBox(height: AppSpacing.x4),
-                Text('Sexo biologico', style: Theme.of(context).textTheme.titleMedium),
+                Text('Sexo biológico', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: AppSpacing.x2),
                 SegmentedButton<BiologicalSex>(
                   segments: const [
@@ -264,7 +307,7 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
                 const SizedBox(height: AppSpacing.x4),
                 if (imcResult == null)
                   Text(
-                    'Preencha altura, peso atual e data de nascimento para gerar a sugestao.',
+                    'Preencha altura, peso atual e data de nascimento para gerar a sugestão.',
                     style: Theme.of(context).textTheme.bodyMedium,
                   )
                 else ...[
@@ -277,12 +320,12 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
                   ),
                   const SizedBox(height: AppSpacing.x2),
                   Text(
-                    'Sugestao inicial de meta: ${suggestedGoal!.toStringAsFixed(1)} kg',
+                    'Sugestão inicial de meta: ${suggestedGoal!.toStringAsFixed(1)} kg',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ],
                 const SizedBox(height: AppSpacing.x4),
-                Text('Como voce quer definir a meta?', style: Theme.of(context).textTheme.titleMedium),
+                Text('Como você quer definir a meta?', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: AppSpacing.x2),
                 SegmentedButton<GoalStrategy>(
                   segments: const [
@@ -292,7 +335,7 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
                     ),
                     ButtonSegment(
                       value: GoalStrategy.custom,
-                      label: Text('Meta propria'),
+                      label: Text('Meta própria'),
                     ),
                   ],
                   selected: {_goalStrategy},
@@ -305,12 +348,21 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
                 const SizedBox(height: AppSpacing.x2),
                 Text(
                   _goalStrategy == GoalStrategy.suggestedByImc
-                      ? 'Usa a referencia calculada pelo IMC para criar uma meta inicial.'
-                      : 'Permite informar manualmente o peso que voce deseja atingir.',
+                      ? 'Usa a referência calculada pelo IMC para criar uma meta inicial.'
+                      : 'Permite informar manualmente o peso que você deseja atingir.',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
+                const SizedBox(height: AppSpacing.x4),
+                Text('Data-alvo da meta', style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: AppSpacing.x2),
+                SoftButton.secondary(
+                  label: _targetDateLabel(),
+                  icon: Icons.event_rounded,
+                  expand: true,
+                  onPressed: _selectTargetDate,
+                ),
                 if (_goalStrategy == GoalStrategy.custom) ...[
-                  const SizedBox(height: AppSpacing.x2),
+                  const SizedBox(height: AppSpacing.x4),
                   SoftTextField(
                     controller: _goalController,
                     label: 'Meta personalizada (kg)',

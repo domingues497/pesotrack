@@ -19,7 +19,7 @@ class KpiGrid extends StatelessWidget {
   final double bmiValue;
   final String bmiLabel;
   final int count;
-  final double missingToGoal;
+  final double? missingToGoal;
   final int streak;
 
   @override
@@ -52,8 +52,8 @@ class KpiGrid extends StatelessWidget {
         ),
         KpiCard(
           label: 'Faltam',
-          value: missingToGoal.toStringAsFixed(1),
-          footnote: 'kg para sua meta',
+          value: missingToGoal?.toStringAsFixed(1) ?? '--',
+          footnote: missingToGoal == null ? 'crie uma meta ativa' : 'kg para sua meta',
         ),
       ],
     );

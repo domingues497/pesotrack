@@ -13,24 +13,25 @@ class HeroWeightCard extends StatelessWidget {
     super.key,
     required this.currentWeight,
     required this.lastRecordedAt,
-    required this.startWeight,
-    required this.goalWeight,
-    required this.progress,
-    this.onScanPressed,
+    this.startWeight,
+    this.goalWeight,
+    this.targetDate,
+    this.progress,
     this.onRegisterPressed,
   });
 
   final double currentWeight;
   final DateTime lastRecordedAt;
-  final double startWeight;
-  final double goalWeight;
-  final double progress;
-  final VoidCallback? onScanPressed;
+  final double? startWeight;
+  final double? goalWeight;
+  final DateTime? targetDate;
+  final double? progress;
   final VoidCallback? onRegisterPressed;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final hasActiveGoal = goalWeight != null && startWeight != null && progress != null;
 
     return SoftCard(
       radius: AppRadii.xLarge,
@@ -121,7 +122,7 @@ class HeroWeightCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        'ultimo registro',
+                        'último registro',
                         style: textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
                       ),
                       const SizedBox(height: AppSpacing.x1),
@@ -129,52 +130,61 @@ class HeroWeightCard extends StatelessWidget {
                         lastRecordedAt.asShortDateTime,
                         style: textTheme.bodySmall,
                       ),
-                      Text(
-                        'meta ${goalWeight.toStringAsFixed(1)} kg',
-                        style: textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
-                      ),
+                      if (hasActiveGoal)
+                        Text(
+                          'meta ${goalWeight!.toStringAsFixed(1)} kg',
+                          style: textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
+                        )
+                      else
+                        Text(
+                          'sem meta ativa',
+                          style: textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
+                        ),
                     ],
                   ),
                 ],
               ),
               const SizedBox(height: AppSpacing.x4),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'inicio ${startWeight.toStringAsFixed(1)} kg',
-                    style: textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
-                  ),
-                  Text(
-                    'meta ${goalWeight.toStringAsFixed(1)} kg',
-                    style: textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.x2),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(AppRadii.full),
-                child: LinearProgressIndicator(
-                  value: progress,
-                  minHeight: 8,
-                  backgroundColor: AppColors.progressTrack,
-                  valueColor: const AlwaysStoppedAnimation<Color>(AppColors.accent),
+              if (hasActiveGoal) ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'início ${startWeight!.toStringAsFixed(1)} kg',
+                      style: textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
+                    ),
+                    Text(
+                      'meta ${goalWeight!.toStringAsFixed(1)} kg',
+                      style: textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
+                    ),
+                  ],
                 ),
-              ),
+                const SizedBox(height: AppSpacing.x1),
+                if (targetDate != null)
+                  Text(
+                    'data-alvo ${targetDate!.asFullDate}',
+                    style: textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
+                  ),
+                const SizedBox(height: AppSpacing.x2),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(AppRadii.full),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 8,
+                    backgroundColor: AppColors.progressTrack,
+                    valueColor: const AlwaysStoppedAnimation<Color>(AppColors.accent),
+                  ),
+                ),
+              ] else
+                Text(
+                  'Crie uma nova meta no perfil para acompanhar sua próxima etapa.',
+                  style: textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
+                ),
               const SizedBox(height: AppSpacing.x4),
               Row(
                 children: [
                   Expanded(
                     child: SoftButton.primary(
-                      label: 'Escanear',
-                      icon: Icons.camera_alt_rounded,
-                      expand: true,
-                      onPressed: onScanPressed,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.x3),
-                  Expanded(
-                    child: SoftButton.secondary(
                       label: 'Registrar',
                       icon: Icons.add_rounded,
                       expand: true,

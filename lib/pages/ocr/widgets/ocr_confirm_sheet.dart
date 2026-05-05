@@ -56,7 +56,7 @@ class _OcrConfirmSheetState extends State<OcrConfirmSheet> {
           ),
           const SizedBox(height: AppSpacing.x2),
           Text(
-            'A leitura ficou estavel. Confirme ou ajuste antes de salvar.',
+            'A leitura ficou estável. Confirme ou ajuste antes de salvar.',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: AppSpacing.x4),
