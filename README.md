@@ -1,10 +1,10 @@
-# 📱 PesoTrack — Diário de Peso Inteligente
+# PesoTrack — Diário de Peso Inteligente
 
 > App Flutter mobile-first para monitoramento diário de peso, com OCR via câmera, integração com Telegram, dashboard histórico, gráficos de evolução e calculadora de IMC — Estilo Visual C (Soft Wellness).
 
 ---
 
-## 📋 Sumário
+## Sumário
 
 - [Visão Geral](#visão-geral)
 - [Regras de Negócio](#regras-de-negócio)
@@ -19,7 +19,7 @@
 
 ---
 
-## 🎯 Visão Geral
+## Visão Geral
 
 O **PesoTrack** é um aplicativo Android/iOS desenvolvido em Flutter que permite ao usuário registrar seu peso diário de forma rápida e inteligente, seja manualmente ou via foto da balança com OCR integrado. O histórico completo pode ser compartilhado com uma nutricionista via bot do Telegram.
 
@@ -29,7 +29,7 @@ O **PesoTrack** é um aplicativo Android/iOS desenvolvido em Flutter que permite
 
 ---
 
-## 🔐 Regras de Negócio
+## Regras de Negócio
 
 ### RN-01 · Cadastro único de perfil
 O usuário preenche nome, peso inicial, altura, sexo biológico e data de nascimento **somente na primeira abertura do app** (onboarding). Após salvo, esses dados podem ser editados somente na tela de Perfil.
@@ -71,7 +71,7 @@ Todos os dados pessoais ficam armazenados **somente no dispositivo** (SQLite loc
 
 ---
 
-## ✅ Requisitos Funcionais
+## Requisitos Funcionais
 
 ### RF-01 · Onboarding
 - [ ] Tela de boas-vindas exibida apenas na primeira abertura
@@ -110,7 +110,7 @@ Todos os dados pessoais ficam armazenados **somente no dispositivo** (SQLite loc
 - [ ] Inputs: peso, altura, sexo, idade
 - [ ] Pré-preenchimento com dados do perfil e último registro
 - [ ] Barra visual indicando posição na escala OMS
-- [ ] Classificação colorida com emoji
+- [ ] Classificação com indicador visual (cores e rótulos)
 - [ ] Cálculo de peso ideal estimado por sexo
 - [ ] Aviso para pessoas acima de 65 anos
 
@@ -129,7 +129,7 @@ Todos os dados pessoais ficam armazenados **somente no dispositivo** (SQLite loc
 
 ---
 
-## 🔒 Requisitos Não Funcionais
+## Requisitos Não Funcionais
 
 ### RNF-01 · Performance
 - O app deve carregar a tela inicial em **menos de 2 segundos** em dispositivos com 2 GB de RAM.
@@ -168,7 +168,7 @@ Todos os dados pessoais ficam armazenados **somente no dispositivo** (SQLite loc
 
 ---
 
-## 🗂️ Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 peso_tracker/
@@ -285,7 +285,7 @@ peso_tracker/
 
 ---
 
-## 📦 Dependências
+## Dependências
 
 ```yaml
 dependencies:
@@ -336,33 +336,30 @@ dev_dependencies:
 
 ---
 
-## 🔄 Fluxo de Telas
+## Fluxo de Telas
 
-```
-Abertura
-   │
-   ├── Primeira vez → OnboardingPage → ProfileSetupPage
-   │                                        │
-   │                                        ▼
-   └── Já configurado ──────────────────► AppShell
-                                            │
-                         ┌──────────────────┼──────────────────────┐
-                         │                  │                       │
-                      HomePage          AddWeightPage          OcrPage
-                      (Dashboard)       (Formulário)           (Scan)
-                         │                  │                       │
-                         │                  └──────────────────────►│
-                         │                                          │
-                         │◄─────────────── ConfirmWeightSheet ◄────┘
-                         │
-                         ├── HistoryPage (lista + filtro + CSV)
-                         ├── ImcPage (calculadora OMS)
-                         └── ProfilePage (dados + Telegram)
+```mermaid
+flowchart TD
+  A[Abertura do app] -->|Primeiro acesso| O[Onboarding]
+  O --> P[Configuração de perfil]
+  A -->|Perfil já configurado| S[AppShell]
+  P --> S
+
+  S --> H[Início (Home)]
+  S --> R[Registro]
+  S --> HI[Histórico]
+  S --> I[IMC]
+  S --> PR[Perfil (rota dedicada)]
+
+  R --> RM[Registro manual]
+  R --> RO[Registro por OCR (câmera/galeria)]
+  RO --> C[Confirmação do peso]
+  C --> HI
 ```
 
 ---
 
-## 🏗️ Arquitetura
+## Arquitetura
 
 O app segue uma arquitetura em **3 camadas** baseada em Clean Architecture simplificada:
 
@@ -386,7 +383,7 @@ O app segue uma arquitetura em **3 camadas** baseada em Clean Architecture simpl
 
 ---
 
-## 🚀 Como Rodar
+## Como Rodar
 
 ```bash
 # 1. Instalar dependências
@@ -412,7 +409,7 @@ flutter analyze
 
 ---
 
-## 🗺️ Roadmap
+## Roadmap
 
 | Versão | Funcionalidade |
 |--------|---------------|
@@ -420,12 +417,14 @@ flutter analyze
 | v0.2   | OCR offline via ML Kit + confirmação |
 | v0.3   | Gráfico de evolução + KPIs + IMC |
 | v0.4   | Integração Telegram bot |
-| v0.5   | Notificações locais + exportação CSV |
+| v0.5   | Notificações locais |
 | v1.0   | Estilo C completo + dark mode + testes |
+| v1.1   | Removido OCR |
+| v1.2   | Implementado multiplas metas |
 
 ---
 
-## 👨‍💻 Desenvolvido por
+## Desenvolvido por
 
 Rafael Domingues — Ponta Grossa, PR  
 Protótipo visual: **Estilo C · Soft Wellness** (terracota, superfícies quentes, mobile-first)
