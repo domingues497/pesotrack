@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/weight_entry.dart';
 import '../../providers/profile_provider.dart';
 import '../../providers/weight_provider.dart';
+import '../../utils/extensions.dart';
 import '../../utils/imc_calculator.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/section_header.dart';
@@ -166,8 +167,8 @@ _TrendInsight _buildTrendInsight(List<WeightEntry> entries) {
   final dailyEntries = _dailyLastEntries(entries);
   if (dailyEntries.length < 2) {
     return const _TrendInsight(
-      title: 'Estável',
-      description: 'Ainda há poucos registros para identificar uma tendência com segurança.',
+      title: 'Tudo bem, ainda é cedo',
+      description: 'Assim que você registrar mais alguns pesos, vamos conseguir mostrar uma leitura mais clara da sua evolução.',
     );
   }
 
@@ -187,24 +188,24 @@ _TrendInsight _buildTrendInsight(List<WeightEntry> entries) {
   final diffFromAverage = latest.weight - average;
 
   final title = switch ((diffFromAverage, slopePerDay)) {
-    (< -0.8, < -0.08) => 'Queda consistente',
-    (< -0.3, < 0) => 'Queda leve',
-    (> 0.8, > 0.08) => 'Alta consistente',
-    (> 0.3, > 0) => 'Alta leve',
-    _ => 'Estável',
+    (< -0.8, < -0.08) => 'Você está avançando bem',
+    (< -0.3, < 0) => 'Você segue em leve queda',
+    (> 0.8, > 0.08) => 'Seu peso subiu nos últimos dias',
+    (> 0.3, > 0) => 'Há uma leve alta recente',
+    _ => 'Seu peso está estável',
   };
 
   final directionText = diffFromAverage < 0 ? 'abaixo' : diffFromAverage > 0 ? 'acima' : 'alinhado com';
-  final diffText = diffFromAverage.abs().toStringAsFixed(1);
+  final diffText = diffFromAverage.abs().asDecimal;
   final paceText = switch (title) {
-    'Queda consistente' => 'O ritmo atual indica progresso contínuo.',
-    'Queda leve' => 'Há redução recente, mas ainda em ritmo moderado.',
-    'Alta consistente' => 'A sequência recente mostra alta clara e merece atenção.',
-    'Alta leve' => 'Há aumento recente, mas ainda com intensidade moderada.',
-    _ => 'As oscilações recentes estão dentro de uma faixa estável.',
+    'Você está avançando bem' => 'O ritmo recente mostra uma evolução consistente.',
+    'Você segue em leve queda' => 'Há uma redução gradual, de forma suave.',
+    'Seu peso subiu nos últimos dias' => 'Vale acompanhar com calma para entender se essa subida continua.',
+    'Há uma leve alta recente' => 'Existe uma oscilação para cima, mas ainda em ritmo moderado.',
+    _ => 'As oscilações recentes seguem dentro de uma faixa esperada.',
   };
 
-  if (diffText == '0.0') {
+  if (diffText == '0,0') {
     return _TrendInsight(
       title: title,
       description: 'Seu último peso está alinhado com a média dos últimos 7 dias. $paceText',

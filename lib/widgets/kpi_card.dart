@@ -24,13 +24,14 @@ class KpiCard extends StatelessWidget {
 
     return SoftCard(
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             label.toUpperCase(),
             style: textTheme.labelMedium?.copyWith(color: AppColors.textMuted),
           ),
-          const SizedBox(height: AppSpacing.x2),
+          const SizedBox(height: AppSpacing.x1),
           Text(
             value,
             style: textTheme.headlineMedium?.copyWith(
@@ -38,7 +39,7 @@ class KpiCard extends StatelessWidget {
             ),
           ),
           if (footnote != null) ...[
-            const SizedBox(height: AppSpacing.x1),
+            const SizedBox(height: 2),
             Text(
               footnote!,
               style: textTheme.bodySmall?.copyWith(

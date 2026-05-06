@@ -75,7 +75,7 @@ class HeroWeightCard extends StatelessWidget {
                     const Icon(Icons.auto_awesome_rounded, size: 14, color: AppColors.accentDeep),
                     const SizedBox(width: AppSpacing.x2),
                     Text(
-                      'foco no progresso real',
+                      'Seu progresso',
                       style: textTheme.bodySmall?.copyWith(
                         color: AppColors.accentDeep,
                         fontWeight: FontWeight.w800,
@@ -105,7 +105,7 @@ class HeroWeightCard extends StatelessWidget {
                               color: AppColors.textPrimary,
                             ),
                             children: [
-                              TextSpan(text: currentWeight.toStringAsFixed(1)),
+                              TextSpan(text: currentWeight.asDecimal),
                               TextSpan(
                                 text: ' kg',
                                 style: textTheme.titleLarge?.copyWith(
@@ -127,12 +127,12 @@ class HeroWeightCard extends StatelessWidget {
                       ),
                       const SizedBox(height: AppSpacing.x1),
                       Text(
-                        lastRecordedAt.asShortDateTime,
+                        '${lastRecordedAt.asShortDate} • ${lastRecordedAt.asTime}',
                         style: textTheme.bodySmall,
                       ),
                       if (hasActiveGoal)
                         Text(
-                          'meta ${goalWeight!.toStringAsFixed(1)} kg',
+                          'Meta: ${goalWeight!.asKg}',
                           style: textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
                         )
                       else
@@ -150,11 +150,7 @@ class HeroWeightCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'início ${startWeight!.toStringAsFixed(1)} kg',
-                      style: textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
-                    ),
-                    Text(
-                      'meta ${goalWeight!.toStringAsFixed(1)} kg',
+                      'Peso inicial ${startWeight!.asKg}',
                       style: textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
                     ),
                   ],
@@ -162,7 +158,7 @@ class HeroWeightCard extends StatelessWidget {
                 const SizedBox(height: AppSpacing.x1),
                 if (targetDate != null)
                   Text(
-                    'data-alvo ${targetDate!.asFullDate}',
+                    'Meta até ${targetDate!.asFullDate}',
                     style: textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
                   ),
                 const SizedBox(height: AppSpacing.x2),

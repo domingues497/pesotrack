@@ -27,11 +27,11 @@ class ProfilePage extends ConsumerWidget {
       builder: (context) {
         final isCompleted = status == GoalStatus.completed;
         return AlertDialog(
-          title: Text(isCompleted ? 'Concluir meta' : 'Cancelar meta'),
+          title: Text(isCompleted ? 'Encerrar como concluída' : 'Cancelar esta meta'),
           content: Text(
             isCompleted
-                ? 'Deseja marcar a meta ativa como concluída?'
-                : 'Deseja cancelar a meta ativa atual?',
+                ? 'Deseja encerrar a meta atual como concluída?'
+                : 'Deseja cancelar a meta atual? Você poderá criar uma nova quando quiser.',
           ),
           actions: [
             TextButton(
@@ -57,7 +57,7 @@ class ProfilePage extends ConsumerWidget {
     }
     AppToast.show(
       context,
-      status == GoalStatus.completed ? 'Meta concluída com sucesso.' : 'Meta cancelada com sucesso.',
+      status == GoalStatus.completed ? 'Meta encerrada como concluída.' : 'Meta cancelada com sucesso.',
     );
   }
 
@@ -88,11 +88,11 @@ class ProfilePage extends ConsumerWidget {
               children: [
                 Text(profile.name, style: Theme.of(context).textTheme.headlineMedium),
                 const SizedBox(height: 8),
-                Text('Altura: ${profile.heightCm.toStringAsFixed(0)} cm'),
-                Text('Peso inicial: ${profile.initialWeight.toStringAsFixed(1)} kg'),
-                Text('Peso atual: ${currentWeight.toStringAsFixed(1)} kg'),
-                Text('Sexo: ${profile.sexLabel}'),
-                Text('Idade: ${profile.age} anos'),
+                Text('Sua altura: ${profile.heightCm.toStringAsFixed(0)} cm'),
+                Text('Seu peso inicial: ${profile.initialWeight.asKg}'),
+                Text('Seu peso atual: ${currentWeight.asKg}'),
+                Text('Sexo biológico: ${profile.sexLabel}'),
+                Text('Idade atual: ${profile.age} anos'),
               ],
             ),
           ),
@@ -101,24 +101,24 @@ class ProfilePage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Meta ativa', style: Theme.of(context).textTheme.titleLarge),
+                Text('Sua meta atual', style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: AppSpacing.x3),
                 if (activeGoal == null)
                   Text(
-                    'Você não tem uma meta ativa no momento. Crie uma nova meta para retomar o acompanhamento.',
+                    'No momento, você não tem uma meta ativa. Quando quiser, pode criar uma nova meta para seguir acompanhando sua jornada.',
                     style: Theme.of(context).textTheme.bodyMedium,
                   )
                 else ...[
-                  Text('Objetivo: ${activeGoal.targetWeight.toStringAsFixed(1)} kg'),
+                  Text('Objetivo atual: ${activeGoal.targetWeight.asKg}'),
+                  Text('Você começou em: ${activeGoal.startWeight.asKg}'),
                   Text('Início da meta: ${activeGoal.startDate.asFullDate}'),
-                  Text('Data-alvo: ${activeGoal.targetDate.asFullDate}'),
-                  Text('Peso de partida: ${activeGoal.startWeight.toStringAsFixed(1)} kg'),
-                  Text('Tipo: ${activeGoal.strategyLabel}'),
-                  Text('Distância atual até a meta: ${missingToGoal!.toStringAsFixed(1)} kg'),
+                  Text('Meta até: ${activeGoal.targetDate.asFullDate}'),
+                  Text('Como a meta foi definida: ${activeGoal.strategyLabel}'),
+                  Text('Faltam ${missingToGoal!.asKg} para a sua meta'),
                 ],
                 const SizedBox(height: AppSpacing.x4),
                 SoftButton.primary(
-                  label: 'Criar nova meta',
+                  label: 'Criar uma nova meta',
                   icon: Icons.flag_rounded,
                   expand: true,
                   onPressed: () {
@@ -147,7 +147,7 @@ class ProfilePage extends ConsumerWidget {
                     children: [
                       Expanded(
                         child: SoftButton.secondary(
-                          label: 'Concluir meta',
+                          label: 'Marcar como concluída',
                           icon: Icons.check_circle_outline_rounded,
                           expand: true,
                           onPressed: () => _confirmEndGoal(context, ref, GoalStatus.completed),
@@ -156,7 +156,7 @@ class ProfilePage extends ConsumerWidget {
                       const SizedBox(width: AppSpacing.x3),
                       Expanded(
                         child: SoftButton.secondary(
-                          label: 'Cancelar meta',
+                          label: 'Cancelar esta meta',
                           icon: Icons.cancel_outlined,
                           expand: true,
                           onPressed: () => _confirmEndGoal(context, ref, GoalStatus.cancelled),
@@ -174,7 +174,7 @@ class ProfilePage extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Histórico de metas', style: Theme.of(context).textTheme.titleLarge),
+                  Text('Suas metas anteriores', style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: AppSpacing.x3),
                   ...profile.goalHistory.map((goal) {
                     return Padding(
@@ -183,14 +183,14 @@ class ProfilePage extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '${goal.targetWeight.toStringAsFixed(1)} kg',
+                            'Meta de ${goal.targetWeight.asKg}',
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           const SizedBox(height: AppSpacing.x1),
                           Text('Período: ${goal.startDate.asFullDate} até ${goal.targetDate.asFullDate}'),
-                          Text('Partida: ${goal.startWeight.toStringAsFixed(1)} kg'),
-                          Text('Tipo: ${goal.strategyLabel}'),
-                          Text('Status: ${goal.statusLabel}'),
+                          Text('Peso de partida: ${goal.startWeight.asKg}'),
+                          Text('Definição da meta: ${goal.strategyLabel}'),
+                          Text('Situação final: ${goal.statusLabel}'),
                         ],
                       ),
                     );
@@ -202,7 +202,7 @@ class ProfilePage extends ConsumerWidget {
           const SizedBox(height: 16),
           FilledButton(
             onPressed: () => ref.read(themeModeProvider.notifier).toggle(),
-            child: const Text('Alternar tema'),
+            child: const Text('Alternar aparência'),
           ),
         ],
       ),
@@ -330,11 +330,11 @@ class _NewGoalSheetState extends ConsumerState<_NewGoalSheet> {
             Text('Nova meta', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: AppSpacing.x2),
             Text(
-              'A nova meta entra como ativa e a anterior vai para o histórico.',
+              'A nova meta fica ativa e a anterior vai para o histórico, sem perder suas informações.',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: AppSpacing.x4),
-            Text('Como definir a meta?', style: Theme.of(context).textTheme.titleMedium),
+            Text('Como você quer definir essa meta?', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: AppSpacing.x2),
             SegmentedButton<GoalStrategy>(
               segments: const [
@@ -359,7 +359,7 @@ class _NewGoalSheetState extends ConsumerState<_NewGoalSheet> {
               Text(
                 suggestedGoal == null
                     ? 'Não foi possível calcular a meta sugerida neste momento.'
-                    : 'Sugestão atual pelo IMC: ${suggestedGoal.toStringAsFixed(1)} kg',
+                    : 'Sugestão atual pelo IMC: ${suggestedGoal.asKg}',
                 style: Theme.of(context).textTheme.bodyMedium,
               )
             else
@@ -370,7 +370,7 @@ class _NewGoalSheetState extends ConsumerState<_NewGoalSheet> {
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
               ),
             const SizedBox(height: AppSpacing.x4),
-            Text('Data-alvo', style: Theme.of(context).textTheme.titleMedium),
+            Text('Meta até', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: AppSpacing.x2),
             SoftButton.secondary(
               label: _targetDate.asFullDate,

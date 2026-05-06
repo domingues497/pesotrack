@@ -149,7 +149,7 @@ class _WeightChartState extends State<WeightChart> {
                       return touchedSpots.map((spot) {
                         final entry = sortedEntries[spot.x.round()];
                         return LineTooltipItem(
-                          '${entry.weight.toStringAsFixed(1)} kg\n${entry.recordedAt.asShortDate}',
+                          '${entry.weight.asKg}\n${entry.recordedAt.asShortDate}',
                           Theme.of(context).textTheme.bodySmall!.copyWith(
                                 color: AppColors.white,
                               ),

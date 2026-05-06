@@ -1,7 +1,26 @@
+import 'package:intl/intl.dart';
+
 import 'date_formatter.dart';
 
 extension WeightFormatting on double {
-  String get asKg => '${toStringAsFixed(1)} kg';
+  String get asDecimal => NumberFormat.decimalPatternDigits(
+        locale: 'pt_BR',
+        decimalDigits: 1,
+      ).format(this);
+
+  String get asSignedDecimal {
+    final absolute = abs().asDecimal;
+    if (this > 0) {
+      return '+$absolute';
+    }
+    if (this < 0) {
+      return '-$absolute';
+    }
+    return absolute;
+  }
+
+  String get asKg => '$asDecimal kg';
+  String get asSignedKg => '$asSignedDecimal kg';
 }
 
 extension DateFormatting on DateTime {
