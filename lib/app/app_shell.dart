@@ -28,7 +28,7 @@ class _AppShellState extends State<AppShell> {
         onOpenRegister: () => setState(() => _currentIndex = 1),
         onOpenHistory: () => setState(() => _currentIndex = 2),
       ),
-      const AddWeightPage(),
+      AddWeightPage(isActive: _currentIndex == 1),
       const HistoryPage(),
       const ImcPage(),
     ];
@@ -95,12 +95,7 @@ class _BrandTitle extends StatelessWidget {
               'PesoTrack',
               style: Theme.of(context).textTheme.titleLarge,
             ),
-            Text(
-              'edição bem-estar',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textMuted,
-                  ),
-            ),
+            
           ],
         ),
       ],

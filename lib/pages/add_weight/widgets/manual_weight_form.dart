@@ -15,10 +15,12 @@ class ManualWeightForm extends ConsumerStatefulWidget {
     super.key,
     this.entry,
     this.onSaved,
+    this.isActive = false,
   });
 
   final WeightEntry? entry;
   final VoidCallback? onSaved;
+  final bool isActive;
 
   @override
   ConsumerState<ManualWeightForm> createState() => _ManualWeightFormState();
@@ -31,6 +33,7 @@ class _ManualWeightFormState extends ConsumerState<ManualWeightForm> {
   late final TextEditingController _noteController;
   late DateTime _selectedAt;
   bool _isSaving = false;
+  bool _didUserChangeDateTime = false;
 
   bool get _isEditing => widget.entry != null;
 
@@ -49,6 +52,14 @@ class _ManualWeightFormState extends ConsumerState<ManualWeightForm> {
   }
 
   @override
+  void didUpdateWidget(covariant ManualWeightForm oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!oldWidget.isActive && widget.isActive) {
+      _refreshCurrentDateTimeIfPristine();
+    }
+  }
+
+  @override
   void dispose() {
     _weightController.dispose();
     _dateController.dispose();
@@ -60,6 +71,23 @@ class _ManualWeightFormState extends ConsumerState<ManualWeightForm> {
   void _syncDateTimeLabels() {
     _dateController.text = _selectedAt.asFullDate;
     _timeController.text = _selectedAt.asTime;
+  }
+
+  bool get _isPristineForAutoDateTime =>
+      !_isEditing &&
+      !_didUserChangeDateTime &&
+      _weightController.text.trim().isEmpty &&
+      _noteController.text.trim().isEmpty;
+
+  void _refreshCurrentDateTimeIfPristine() {
+    if (!_isPristineForAutoDateTime) {
+      return;
+    }
+
+    setState(() {
+      _selectedAt = DateTime.now();
+      _syncDateTimeLabels();
+    });
   }
 
   double? _parseWeight() {
@@ -84,6 +112,7 @@ class _ManualWeightFormState extends ConsumerState<ManualWeightForm> {
     }
 
     setState(() {
+      _didUserChangeDateTime = true;
       _selectedAt = DateTime(
         selected.year,
         selected.month,
@@ -112,6 +141,7 @@ class _ManualWeightFormState extends ConsumerState<ManualWeightForm> {
     }
 
     setState(() {
+      _didUserChangeDateTime = true;
       _selectedAt = DateTime(
         _selectedAt.year,
         _selectedAt.month,
@@ -173,6 +203,7 @@ class _ManualWeightFormState extends ConsumerState<ManualWeightForm> {
     _weightController.clear();
     _noteController.clear();
     _selectedAt = DateTime.now();
+    _didUserChangeDateTime = false;
     _syncDateTimeLabels();
     widget.onSaved?.call();
   }
