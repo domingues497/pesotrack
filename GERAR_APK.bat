@@ -1,40 +1,116 @@
 @echo off
-setlocal
+color 0A
+title Configurador de Rede CAPAL (Admin)
 
-cd /d "%~dp0"
+:: ===============================
+:: USUARIO ADMINISTRADOR
+:: ===============================
 
-echo ==========================================
-echo PesoTrack - Geracao automatica de APK
-echo ==========================================
+set USUARIO=CAPAL\rafael.domingues
+
+:: ===============================
+:: MENU
+:: ===============================
+
+:MENU
+cls
+echo =========================================
+echo      CONFIGURADOR DE REDE CAPAL
+echo =========================================
 echo.
-
-echo [1/4] Baixando dependencias...
-call flutter pub get
-if errorlevel 1 goto :erro
-
+echo Usuario logado: %USERDOMAIN%\%USERNAME%
+echo Computador: %COMPUTERNAME%
 echo.
-echo [2/4] Analisando projeto...
-call flutter analyze
-if errorlevel 1 goto :erro
-
+echo Escolha a unidade:
+echo 1 - CLP  (192.168.4.46 / 255.255.255.0 / 192.168.4.1)
+echo 2 - IBA  (192.168.13.28 / 255.255.255.0 / 192.168.13.1)
+echo 3 - JQT  (192.168.8.36 / 255.255.255.0 / 192.168.8.1)
+echo 4 - STO  (192.168.23.58 / 255.255.255.0 / 192.168.23.1)
+echo 5 - PGR  (192.168.25.4 / 255.255.255.0 / 192.168.25.1)
 echo.
-echo [3/4] Rodando testes...
-call flutter test
-if errorlevel 1 goto :erro
+set /p OPCAO=Digite a opcao desejada: 
 
-echo.
-echo [4/4] Gerando APK de release...
-call flutter build apk --release
-if errorlevel 1 goto :erro
+:: ===============================
+:: DEFINICAO DOS IPS
+:: ===============================
 
-echo.
-echo APK gerado com sucesso:
-echo build\app\outputs\flutter-apk\app-release.apk
-pause
-exit /b 0
+if "%OPCAO%"=="1" (
+    set UNIDADE=CLP
+    set IP=192.168.4.46
+    set MASCARA=255.255.255.0
+    set GATEWAY=192.168.4.1
+)
 
-:erro
-echo.
-echo O processo falhou. Revise as mensagens acima.
-pause
-exit /b 1
+if "%OPCAO%"=="2" (
+    set UNIDADE=IBA
+    set IP=192.168.13.28
+    set MASCARA=255.255.255.0
+    set GATEWAY=192.168.13.1
+)
+
+if "%OPCAO%"=="3" (
+    set UNIDADE=JQT
+    set IP=192.168.8.36
+    set MASCARA=255.255.255.0
+    set GATEWAY=192.168.8.1
+)
+
+if "%OPCAO%"=="4" (
+    set UNIDADE=STO
+    set IP=192.168.23.58
+    set MASCARA=255.255.255.0
+    set GATEWAY=192.168.23.1
+)
+
+if "%OPCAO%"=="5 (
+    set UNIDADE=PGR
+    set IP=192.168.25.4
+    set MASCARA=255.255.255.0
+    set GATEWAY=192.168.25.1
+)
+
+:: ===============================
+:: VALIDACAO
+:: ===============================
+
+if not defined UNIDADE (
+    echo.
+    echo Opcao invalida!
+    timeout /t 2 >nul
+    goto MENU
+)
+
+:: ===============================
+:: CRIA SCRIPT TEMPORARIO (ADMIN)
+:: ===============================
+
+set TEMPBAT=%temp%\config_ip_admin.bat
+
+echo @echo off > "%TEMPBAT%"
+echo color 0B >> "%TEMPBAT%"
+echo title Configurando Rede - %UNIDADE% >> "%TEMPBAT%"
+echo set INTERFACE=Rede >> "%TEMPBAT%"
+
+echo echo ===================================== >> "%TEMPBAT%"
+echo echo CONFIGURANDO %UNIDADE% >> "%TEMPBAT%"
+echo echo ===================================== >> "%TEMPBAT%"
+echo. >> "%TEMPBAT%"
+
+echo netsh interface ip set address name^="%%INTERFACE%%" static %IP% %MASCARA% %GATEWAY% 1 >> "%TEMPBAT%"
+echo netsh interface ip set dns name^="%%INTERFACE%%" static 192.168.1.231 >> "%TEMPBAT%"
+echo netsh interface ip add dns name^="%%INTERFACE%%" 8.8.8.8 index^=2 >> "%TEMPBAT%"
+
+echo echo. >> "%TEMPBAT%"
+echo echo Configuracao aplicada. >> "%TEMPBAT%"
+echo echo. >> "%TEMPBAT%"
+echo ipconfig >> "%TEMPBAT%"
+echo echo. >> "%TEMPBAT%"
+echo pause >> "%TEMPBAT%"
+
+:: ===============================
+:: EXECUTA COMO ADMIN (SAVE CRED)
+:: ===============================
+
+runas /savecred /user:%USUARIO% "%TEMPBAT%"
+
+exit
