@@ -44,6 +44,11 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Signing (Play Store)
+/android/key.properties
+*.jks
+*.keystore
+
 *.txt
 *.bat
 GERAR_APK.bat
