@@ -1,6 +1,6 @@
-# PesoTrack — Diário de Peso Inteligente
+# PesoTrack — Acompanhamento Inteligente de Peso
 
-> App Flutter mobile-first para monitoramento diário de peso, com OCR via câmera, integração com Telegram, dashboard histórico, gráficos de evolução e calculadora de IMC — Estilo Visual C (Soft Wellness).
+> Aplicativo Flutter mobile-first para acompanhamento de peso, com onboarding, metas, dashboard, histórico, gráficos de evolução e calculadora de IMC. O projeto já possui base para OCR e integrações futuras.
 
 ---
 
@@ -21,11 +21,21 @@
 
 ## Visão Geral
 
-O **PesoTrack** é um aplicativo Android/iOS desenvolvido em Flutter que permite ao usuário registrar seu peso diário de forma rápida e inteligente, seja manualmente ou via foto da balança com OCR integrado. O histórico completo pode ser compartilhado com uma nutricionista via bot do Telegram.
+O **PesoTrack** é um aplicativo Android/iOS desenvolvido em Flutter para acompanhamento contínuo de peso corporal. A experiência atual prioriza cadastro inicial, definição de metas, registro manual, histórico, indicadores visuais e cálculo de IMC em uma interface mobile-first.
+
+No estado atual do projeto, o fluxo principal entregue contempla:
+- onboarding e configuração inicial do perfil
+- dashboard com resumo da evolução
+- registro manual de peso
+- histórico de registros
+- calculadora de IMC
+- gestão de metas no perfil
+
+O repositório também já possui estrutura técnica para evolução com OCR, notificações, exportação e integrações externas.
 
 **Personas:**
 - **Usuário final** — pessoa que quer monitorar o próprio peso com mínimo esforço
-- **Nutricionista** — profissional que analisa a evolução do paciente pelo Telegram
+- **Profissional de saúde** — acompanha a evolução do usuário a partir dos registros e relatórios do app
 
 ---
 
@@ -97,7 +107,7 @@ Todos os dados pessoais ficam armazenados **somente no dispositivo** (SQLite loc
 - [ ] Extração de texto numérico via `google_mlkit_text_recognition`
 - [ ] Animação de "scan" enquanto processa
 - [ ] Tela de confirmação com peso detectado e campo editável
-- [ ] Envio ao Telegram após confirmação (RN-05)
+- [ ] Integração do fluxo OCR com o registro principal do aplicativo
 
 ### RF-05 · Histórico
 - [ ] Lista paginada de todos os registros, ordem decrescente por data
@@ -171,41 +181,46 @@ Todos os dados pessoais ficam armazenados **somente no dispositivo** (SQLite loc
 ## Estrutura do Projeto
 
 ```
-peso_tracker/
+pesotrack/
 │
 ├── android/                        # Configurações nativas Android
 ├── ios/                            # Configurações nativas iOS
 ├── assets/
-│   ├── images/                     # Ícone do app, splash, ilustrações
+│   ├── icons/                      # Ícones base e assets para launcher
 │   └── fonts/                      # Plus Jakarta Sans (display), Inter (body)
 │
 ├── lib/
-│   ├── main.dart                   # Entrada da aplicação, setup do tema e DI
+│   ├── main.dart                   # Entrada da aplicação
 │   │
 │   ├── app/
-│   │   ├── app.dart                # MaterialApp + roteamento raiz
-│   │   ├── app_shell.dart          # Scaffold com NavigationBar (5 destinos)
-│   │   └── routes.dart             # Definição de rotas nomeadas
+│   │   ├── app.dart                # MaterialApp, AppGate e rotas
+│   │   ├── app_shell.dart          # Scaffold principal com NavigationBar
+│   │   └── routes.dart             # Rotas nomeadas da aplicação
 │   │
 │   ├── theme/
-│   │   ├── app_theme.dart          # ThemeData claro e escuro (Estilo C)
-│   │   ├── app_colors.dart         # Paleta de cores constantes
-│   │   └── app_text_styles.dart    # TextStyle reutilizáveis
+│   │   ├── app_theme.dart          # ThemeData claro e escuro
+│   │   ├── app_colors.dart         # Paleta de cores
+│   │   ├── app_gradients.dart      # Gradientes da interface
+│   │   ├── app_radii.dart          # Raios e cantos padronizados
+│   │   ├── app_shadows.dart        # Sombras reutilizáveis
+│   │   ├── app_spacing.dart        # Escala de espaçamento
+│   │   └── app_text_styles.dart    # Tipografia reutilizável
 │   │
 │   ├── models/
 │   │   ├── weight_entry.dart       # Modelo de registro de peso
-│   │   ├── user_profile.dart       # Modelo do perfil do usuário
+│   │   ├── user_profile.dart       # Perfil do usuário e metas
 │   │   └── imc_result.dart         # Modelo de resultado do IMC
 │   │
 │   ├── services/
 │   │   ├── database_service.dart   # SQLite: CRUD de registros
-│   │   ├── profile_service.dart    # shared_preferences: perfil
-│   │   ├── ocr_service.dart        # Google ML Kit: extração de peso da foto
-│   │   ├── telegram_service.dart   # HTTP: envio de foto/peso ao bot
-│   │   ├── notification_service.dart # Notificações locais diárias
-│   │   └── export_service.dart     # Geração e compartilhamento de CSV
+│   │   ├── export_service.dart     # Exportação de dados
+│   │   ├── notification_service.dart # Notificações locais
+│   │   ├── ocr_service.dart        # OCR com Google ML Kit
+│   │   ├── profile_service.dart    # Persistência do perfil
+│   │   ├── telegram_service.dart   # Integrações externas futuras
+│   │   └── weight_entries_service.dart # Regras de acesso aos registros
 │   │
-│   ├── providers/                  # Gerenciamento de estado (Provider / Riverpod)
+│   ├── providers/                  # Gerenciamento de estado com Riverpod
 │   │   ├── weight_provider.dart    # Estado dos registros de peso
 │   │   ├── profile_provider.dart   # Estado do perfil do usuário
 │   │   └── theme_provider.dart     # Estado do tema (claro/escuro)
@@ -226,10 +241,11 @@ peso_tracker/
 │   │   ├── add_weight/
 │   │   │   ├── add_weight_page.dart       # Registro manual
 │   │   │   └── widgets/
-│   │   │       └── weight_form.dart       # Formulário de entrada
+│   │   │       ├── manual_weight_form.dart # Formulário principal de registro
+│   │   │       └── weight_form.dart        # Componentes auxiliares de formulário
 │   │   │
 │   │   ├── ocr/
-│   │   │   ├── ocr_page.dart              # Tela de scan da balança
+│   │   │   ├── ocr_page.dart              # Fluxo OCR disponível para integração
 │   │   │   └── widgets/
 │   │   │       ├── upload_zone.dart       # Área de upload com animação
 │   │   │       ├── scan_animation.dart    # Animação da linha de scan
@@ -256,7 +272,7 @@ peso_tracker/
 │   │   ├── soft_card.dart          # Card com borda e sombra do Estilo C
 │   │   ├── soft_button.dart        # Botão primário e secundário
 │   │   ├── soft_text_field.dart    # Campo de texto estilizado
-│   │   ├── section_header.dart     # Cabeçalho de seção com label + "ver todos"
+│   │   ├── section_header.dart     # Cabeçalho de seção
 │   │   ├── kpi_card.dart           # Card de KPI individual
 │   │   ├── delta_badge.dart        # Badge de variação (+ / -)
 │   │   ├── app_toast.dart          # Feedback toast inline
@@ -291,6 +307,8 @@ peso_tracker/
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   # Estado
   flutter_riverpod: ^2.5.1
@@ -308,6 +326,7 @@ dependencies:
 
   # Câmera e galeria
   image_picker: ^1.1.2
+  camera: ^0.11.0+2
 
   # Gráficos
   fl_chart: ^0.68.0
@@ -324,14 +343,16 @@ dependencies:
   permission_handler: ^11.3.1
 
   # UI auxiliares
-  intl: ^0.19.0
+  intl: ^0.20.2
   share_plus: ^9.0.0
+  image: ^4.5.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   mocktail: ^1.0.4
   flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.3
 ```
 
 ---
@@ -340,21 +361,30 @@ dev_dependencies:
 
 ```mermaid
 flowchart TD
-  A[Abertura do app] -->|Primeiro acesso| O[Onboarding]
-  O --> P[Configuração de perfil]
-  A -->|Perfil já configurado| S[AppShell]
-  P --> S
+  A[Abertura do app] --> G{Perfil existente?}
+  G -->|Não| O[Onboarding]
+  O --> P[Configuração inicial do perfil]
+  P --> S[AppShell]
+  G -->|Sim| S
 
-  S --> H[Início (Home)]
+  S --> H[Início]
   S --> R[Registro]
   S --> HI[Histórico]
   S --> I[IMC]
-  S --> PR[Perfil (rota dedicada)]
+  S --> PR[Perfil]
 
   R --> RM[Registro manual]
-  R --> RO[Registro por OCR (câmera/galeria)]
-  RO --> C[Confirmação do peso]
-  C --> HI
+  RM --> H
+  RM --> HI
+
+  PR --> MG[Criar ou encerrar meta]
+  MG --> H
+```
+
+Fluxo complementar disponível no código, mas fora da navegação principal atual:
+
+```text
+OcrPage -> confirmação de leitura -> salvamento como entrada OCR
 ```
 
 ---
@@ -413,14 +443,15 @@ flutter analyze
 
 | Versão | Funcionalidade |
 |--------|---------------|
-| v0.1   | Onboarding + registro manual + histórico local |
-| v0.2   | OCR offline via ML Kit + confirmação |
-| v0.3   | Gráfico de evolução + KPIs + IMC |
-| v0.4   | Integração Telegram bot |
-| v0.5   | Notificações locais |
-| v1.0   | Estilo C completo + dark mode + testes |
-| v1.1   | Removido OCR |
-| v1.2   | Implementado multiplas metas |
+| v0.1   | Onboarding e persistência local do perfil |
+| v0.2   | Registro manual de peso e histórico local |
+| v0.3   | Dashboard com KPIs, gráfico de evolução e IMC |
+| v0.4   | Gestão de metas e acompanhamento no perfil |
+| v1.0   | Refinamento visual, tema escuro e organização da base |
+| v1.1   | Integração do OCR ao fluxo principal de registro |
+| v1.2   | Exportação de dados e notificações locais |
+| v1.3   | Integração com Telegram e reenvio de pendências |
+| v1.4   | Backup e restauração de dados |
 
 ---
 
@@ -431,4 +462,4 @@ Protótipo visual: **Estilo C · Soft Wellness** (terracota, superfícies quente
 
 ---
 
-*Documentação gerada em 27 de abril de 2026.*
+*Documentação atualizada em 5 de maio de 2026.*
